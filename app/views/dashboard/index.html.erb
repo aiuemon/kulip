@@ -1,0 +1,9 @@
+<h1>ダッシュボード</h1>
+
+<p>ようこそ、<%= current_user.email %> さん</p>
+
+<% if current_user.admin? %>
+  <p><strong>管理者</strong></p>
+<% end %>
+
+<p><%= link_to "ログアウト", destroy_user_session_path, data: { turbo_method: :delete } %></p>

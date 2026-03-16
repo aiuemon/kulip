@@ -1,0 +1,35 @@
+<h1>初期セットアップ</h1>
+
+<p>システム管理者アカウントを作成してください。</p>
+
+<%= form_with model: @user, url: setup_path do |f| %>
+  <% if @user.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= @user.errors.count %>件のエラーがあります:</h2>
+      <ul>
+        <% @user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :email, "メールアドレス" %>
+    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+  </div>
+
+  <div>
+    <%= f.label :password, "パスワード" %>
+    <%= f.password_field :password, autocomplete: "new-password" %>
+  </div>
+
+  <div>
+    <%= f.label :password_confirmation, "パスワード（確認）" %>
+    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
+  </div>
+
+  <div>
+    <%= f.submit "管理者アカウントを作成" %>
+  </div>
+<% end %>
