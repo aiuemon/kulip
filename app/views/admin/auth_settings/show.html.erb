@@ -24,6 +24,14 @@
     <%= f.check_box :local_auth_show_on_login %>
   </div>
 
+  <h2>セルフサインアップ</h2>
+
+  <div>
+    <%= f.label :self_signup_enabled, "新規登録を許可する" %>
+    <%= f.check_box :self_signup_enabled %>
+    <p><small>有効にすると、ログイン画面から新規ユーザー登録ができるようになります。</small></p>
+  </div>
+
   <h2>外部 IdP</h2>
   <p>
     登録済み IdP: <%= IdentityProvider.count %> 件

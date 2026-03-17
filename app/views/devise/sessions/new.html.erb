@@ -48,3 +48,7 @@
 <% unless AuthSetting.local_auth_show_on_login? || visible_idps.any? %>
   <p>利用可能なログイン方法がありません。管理者に連絡してください。</p>
 <% end %>
+
+<% if AuthSetting.self_signup_enabled? %>
+  <p><%= link_to "アカウントをお持ちでない方はこちら", new_user_registration_path %></p>
+<% end %>

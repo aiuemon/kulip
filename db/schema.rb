@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_17_074913) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_17_115903) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -43,6 +43,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_074913) do
     t.datetime "created_at", null: false
     t.boolean "local_auth_enabled", default: true, null: false
     t.boolean "local_auth_show_on_login", default: true, null: false
+    t.boolean "self_signup_enabled", default: false, null: false
     t.datetime "updated_at", null: false
   end
 
