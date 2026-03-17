@@ -275,32 +275,40 @@ Devise.setup do |config|
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
 
-  # SAML 認証（環境変数で設定）
-  if ENV["SAML_IDP_SSO_URL"].present?
-    config.omniauth :saml,
-      idp_sso_service_url: ENV["SAML_IDP_SSO_URL"],
-      idp_slo_service_url: ENV["SAML_IDP_SLO_URL"],
-      idp_cert: ENV["SAML_IDP_CERT"],
-      sp_entity_id: ENV.fetch("SAML_SP_ENTITY_ID", "kulip"),
-      name_identifier_format: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
-      attribute_statements: {
-        email: [ "email", "mail", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" ]
-      }
-  end
-
-  # OIDC 認証（環境変数で設定）
-  if ENV["OIDC_ISSUER"].present?
-    config.omniauth :openid_connect,
-      name: :openid_connect,
-      scope: %i[openid email profile],
-      response_type: :code,
-      issuer: ENV["OIDC_ISSUER"],
-      discovery: true,
-      client_options: {
-        identifier: ENV["OIDC_CLIENT_ID"],
-        secret: ENV["OIDC_CLIENT_SECRET"],
-        redirect_uri: ENV["OIDC_REDIRECT_URI"]
-      }
+  # DB から IdP を読み込んで OmniAuth プロバイダを設定
+  # 注意: IdP を追加・変更した後はアプリの再起動が必要
+  begin
+    if defined?(IdentityProvider) && ActiveRecord::Base.connection.table_exists?("identity_providers")
+      IdentityProvider.enabled.find_each do |idp|
+      case idp.provider_type
+      when "saml"
+        config.omniauth :saml,
+          name: "saml_#{idp.slug}",
+          idp_sso_service_url: idp.settings["idp_sso_url"],
+          idp_slo_service_url: idp.settings["idp_slo_url"],
+          idp_cert: idp.settings["idp_cert"],
+          sp_entity_id: idp.settings["sp_entity_id"] || "kulip",
+          name_identifier_format: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+          attribute_statements: {
+            email: [ "email", "mail", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" ]
+          }
+      when "oidc"
+        config.omniauth :openid_connect,
+          name: "oidc_#{idp.slug}",
+          scope: %i[openid email profile],
+          response_type: :code,
+          issuer: idp.settings["issuer"],
+          discovery: true,
+          client_options: {
+            identifier: idp.settings["client_id"],
+            secret: idp.settings["client_secret"],
+            redirect_uri: idp.settings["redirect_uri"]
+          }
+      end
+      end
+    end
+  rescue StandardError
+    # マイグレーション前やテーブルが存在しない場合はスキップ
   end
 
   # ==> Warden configuration

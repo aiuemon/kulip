@@ -1,0 +1,41 @@
+<h1>IdP 設定</h1>
+
+<p>
+  <%= link_to "SAML IdP を追加", new_admin_identity_provider_path(provider_type: "saml") %> |
+  <%= link_to "OIDC IdP を追加", new_admin_identity_provider_path(provider_type: "oidc") %>
+</p>
+
+<% if @identity_providers.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th>種別</th>
+        <th>名前</th>
+        <th>スラッグ</th>
+        <th>有効</th>
+        <th>ログイン画面に表示</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @identity_providers.each do |idp| %>
+        <tr>
+          <td><%= idp.provider_type.upcase %></td>
+          <td><%= idp.name %></td>
+          <td><%= idp.slug %></td>
+          <td><%= idp.enabled? ? "有効" : "無効" %></td>
+          <td><%= idp.show_on_login? ? "表示" : "非表示" %></td>
+          <td>
+            <%= link_to "編集", edit_admin_identity_provider_path(idp) %> |
+            <%= link_to "削除", admin_identity_provider_path(idp), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>IdP が登録されていません。</p>
+<% end %>
+
+<p><%= link_to "認証設定へ", admin_auth_settings_path %></p>
+<p><%= link_to "ダッシュボードへ戻る", root_path %></p>

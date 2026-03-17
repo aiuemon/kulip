@@ -9,6 +9,12 @@ Rails.application.routes.draw do
   # ダッシュボード（ルート）
   root "dashboard#index"
 
+  # 管理者画面
+  namespace :admin do
+    resources :identity_providers
+    resource :auth_settings, only: %i[show update]
+  end
+
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
