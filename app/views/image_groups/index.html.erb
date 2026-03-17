@@ -1,0 +1,40 @@
+<h1>アップロード一覧</h1>
+
+<p>
+  <%= link_to "新規アップロード", new_image_group_path %>
+</p>
+
+<% if @image_groups.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th>グループ名</th>
+        <th>画像数</th>
+        <th>ステータス</th>
+        <th>アップロード日時</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @image_groups.each do |group| %>
+        <tr>
+          <td><%= link_to group.name, image_group_path(group) %></td>
+          <td><%= group.images_count %> 件</td>
+          <td><%= group.status_summary %></td>
+          <td><%= l(group.created_at, format: :long) %></td>
+          <td>
+            <%= link_to "詳細", image_group_path(group) %>
+            <% if group.completed_count > 0 %>
+              | <%= link_to "DL", download_image_group_path(group, format: "txt"), title: "テキスト形式でダウンロード" %>
+            <% end %>
+            | <%= link_to "削除", image_group_path(group), data: { turbo_method: :delete, turbo_confirm: "グループ内の全ての画像も削除されます。本当に削除しますか？" } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>アップロードされた画像がありません。</p>
+<% end %>
+
+<p><%= link_to "ダッシュボードに戻る", root_path %></p>

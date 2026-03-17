@@ -2,6 +2,7 @@ class Image < ApplicationRecord
   STATUSES = %w[pending processing completed failed].freeze
 
   belongs_to :user
+  belongs_to :image_group, optional: true
   has_one_attached :file
 
   validates :name, presence: true

@@ -10,14 +10,18 @@ Rails.application.routes.draw do
   # ダッシュボード（ルート）
   root "dashboard#index"
 
-  # 画像
-  resources :images, only: %i[index show new create destroy] do
+  # 画像グループ
+  resources :image_groups, only: %i[index show new create destroy] do
+    member do
+      get :download
+    end
+  end
+
+  # 画像（グループ内）
+  resources :images, only: %i[show destroy] do
     member do
       post :retry
       get :download
-    end
-    collection do
-      get :download_all
     end
   end
 

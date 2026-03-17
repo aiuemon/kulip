@@ -2,44 +2,18 @@ class ImagesController < ApplicationController
   before_action :authenticate_user!
   before_action :set_image, only: %i[show destroy retry download]
 
-  def index
-    @images = current_user.images.recent.with_attached_file
-  end
-
   def show
   end
 
-  def new
-    @image = current_user.images.build
-  end
-
-  def create
-    uploaded_files = Array(params[:images])
-
-    if uploaded_files.empty?
-      redirect_to new_image_path, alert: "ファイルを選択してください。"
-      return
-    end
-
-    created_count = 0
-    uploaded_files.each do |file|
-      image = current_user.images.build(
-        name: file.original_filename,
-        file: file
-      )
-      created_count += 1 if image.save
-    end
-
-    if created_count > 0
-      redirect_to images_path, notice: "#{created_count}件の画像をアップロードしました。"
-    else
-      redirect_to new_image_path, alert: "アップロードに失敗しました。"
-    end
-  end
-
   def destroy
+    image_group = @image.image_group
     @image.destroy
-    redirect_to images_path, notice: "画像を削除しました。"
+
+    if image_group
+      redirect_to image_group_path(image_group), notice: "画像を削除しました。"
+    else
+      redirect_to image_groups_path, notice: "画像を削除しました。"
+    end
   end
 
   def retry
@@ -62,21 +36,6 @@ class ImagesController < ApplicationController
     send_data content, filename: filename, type: content_type, disposition: "attachment"
   end
 
-  def download_all
-    images = current_user.images.where(status: "completed").where.not(ocr_result: nil)
-
-    if images.empty?
-      redirect_to images_path, alert: "ダウンロードできる結果がありません。"
-      return
-    end
-
-    format = params[:format] || "txt"
-    zip_data = generate_zip(images, format)
-
-    send_data zip_data, filename: "ocr_results_#{Time.current.strftime('%Y%m%d%H%M%S')}.zip",
-                        type: "application/zip", disposition: "attachment"
-  end
-
   private
 
   def set_image
@@ -97,18 +56,4 @@ class ImagesController < ApplicationController
     end
   end
 
-  def generate_zip(images, format)
-    require "zip"
-
-    stringio = Zip::OutputStream.write_buffer do |zio|
-      images.each do |image|
-        content, filename, = generate_download_content(image, format)
-        zio.put_next_entry(filename)
-        zio.write(content)
-      end
-    end
-
-    stringio.rewind
-    stringio.read
-  end
 end

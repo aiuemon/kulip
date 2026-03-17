@@ -1,0 +1,72 @@
+<h1><%= @image_group.name %></h1>
+
+<p>
+  ステータス: <%= @image_group.status_summary %> |
+  画像数: <%= @image_group.images_count %> 件 |
+  完了: <%= @image_group.completed_count %> 件
+</p>
+
+<% if @image_group.completed_count > 0 %>
+  <h2>一括ダウンロード</h2>
+  <p>
+    完了した <%= @image_group.completed_count %> 件の結果をダウンロード:
+    <%= link_to "テキスト形式 (ZIP)", download_image_group_path(@image_group, format: "txt") %> |
+    <%= link_to "Markdown 形式 (ZIP)", download_image_group_path(@image_group, format: "md") %>
+  </p>
+<% end %>
+
+<h2>画像一覧</h2>
+
+<% if @images.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th>サムネイル</th>
+        <th>ファイル名</th>
+        <th>ステータス</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @images.each do |image| %>
+        <tr>
+          <td>
+            <% if image.file.attached? && image.file.content_type.start_with?("image/") %>
+              <%= image_tag image.file.variant(resize_to_limit: [100, 100]) %>
+            <% else %>
+              -
+            <% end %>
+          </td>
+          <td><%= image.name %></td>
+          <td>
+            <% case image.status %>
+            <% when "pending" %>
+              待機中
+            <% when "processing" %>
+              処理中
+            <% when "completed" %>
+              完了
+            <% when "failed" %>
+              失敗
+            <% end %>
+          </td>
+          <td>
+            <%= link_to "詳細", image_path(image) %>
+            <% if image.completed? && image.ocr_result.present? %>
+              | <%= link_to "DL", download_image_path(image, format: "txt"), title: "ダウンロード" %>
+            <% end %>
+            <% if image.failed? || image.pending? %>
+              | <%= link_to "再実行", retry_image_path(image), data: { turbo_method: :post } %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>画像がありません。</p>
+<% end %>
+
+<p>
+  <%= link_to "一覧に戻る", image_groups_path %>
+</p>

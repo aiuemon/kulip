@@ -6,6 +6,7 @@ class User < ApplicationRecord
          :omniauthable
 
   has_many :images, dependent: :destroy
+  has_many :image_groups, dependent: :destroy
 
   def self.from_omniauth(auth)
     # メールアドレスで既存ユーザーを検索、なければ作成

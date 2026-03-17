@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_17_115903) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_17_121734) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -61,13 +61,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_115903) do
     t.index ["slug"], name: "index_identity_providers_on_slug", unique: true
   end
 
+  create_table "image_groups", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_image_groups_on_user_id"
+  end
+
   create_table "images", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.integer "image_group_id"
     t.string "name"
     t.text "ocr_result"
     t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.index ["image_group_id"], name: "index_images_on_image_group_id"
     t.index ["status"], name: "index_images_on_status"
     t.index ["user_id"], name: "index_images_on_user_id"
   end
@@ -87,5 +97,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_115903) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "image_groups", "users"
+  add_foreign_key "images", "image_groups"
   add_foreign_key "images", "users"
 end

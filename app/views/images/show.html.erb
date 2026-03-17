@@ -36,9 +36,13 @@
 <% end %>
 
 <p>
-  <%= link_to "一覧に戻る", images_path %>
-  <% if @image.failed? %>
-    <%= link_to "再試行", retry_image_path(@image), data: { turbo_method: :post } %>
+  <% if @image.image_group %>
+    <%= link_to "グループに戻る", image_group_path(@image.image_group) %>
+  <% else %>
+    <%= link_to "一覧に戻る", image_groups_path %>
   <% end %>
-  <%= link_to "削除", image_path(@image), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" } %>
+  <% if @image.failed? || @image.pending? %>
+    | <%= link_to "再試行", retry_image_path(@image), data: { turbo_method: :post } %>
+  <% end %>
+  | <%= link_to "削除", image_path(@image), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" } %>
 </p>
