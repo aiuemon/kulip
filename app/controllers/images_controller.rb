@@ -55,5 +55,4 @@ class ImagesController < ApplicationController
       [ image.ocr_result, "#{base_name}.txt", "text/plain" ]
     end
   end
-
 end
