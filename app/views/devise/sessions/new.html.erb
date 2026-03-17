@@ -32,10 +32,14 @@
   <ul>
     <% visible_idps.each do |idp| %>
       <li>
-        <%= button_to idp.name,
-            user_omniauth_authorize_path(idp.omniauth_provider_name),
-            method: :post,
-            data: { turbo: false } %>
+        <% if idp.omniauth_route_available? %>
+          <%= button_to idp.name,
+              user_omniauth_authorize_path(idp.omniauth_provider_name),
+              method: :post,
+              data: { turbo: false } %>
+        <% else %>
+          <span><%= idp.name %>（アプリ再起動が必要）</span>
+        <% end %>
       </li>
     <% end %>
   </ul>

@@ -37,5 +37,19 @@
   <p>IdP が登録されていません。</p>
 <% end %>
 
+<% if Rails.env.development? %>
+  <h2>アプリ再起動</h2>
+  <p>IdP の追加・変更を反映するにはアプリの再起動が必要です。</p>
+  <%= button_to "アプリを再起動", restart_app_admin_identity_providers_path, data: { turbo: false, confirm: "アプリを再起動しますか？" } %>
+<% end %>
+
+<% if flash[:notice]&.include?("再起動中") %>
+  <script>
+    setTimeout(function() {
+      location.reload();
+    }, 3000);
+  </script>
+<% end %>
+
 <p><%= link_to "認証設定へ", admin_auth_settings_path %></p>
 <p><%= link_to "ダッシュボードへ戻る", root_path %></p>
