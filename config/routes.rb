@@ -10,7 +10,11 @@ Rails.application.routes.draw do
   root "dashboard#index"
 
   # 画像
-  resources :images, only: %i[index show new create destroy]
+  resources :images, only: %i[index show new create destroy] do
+    member do
+      post :retry
+    end
+  end
 
   # 管理者画面
   namespace :admin do
