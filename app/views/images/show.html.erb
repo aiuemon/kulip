@@ -27,6 +27,12 @@
 <% if @image.ocr_result.present? %>
   <h2>OCR 結果</h2>
   <pre><%= @image.ocr_result %></pre>
+
+  <h3>ダウンロード</h3>
+  <ul>
+    <li><%= link_to "テキスト形式 (.txt)", download_image_path(@image, format: "txt") %></li>
+    <li><%= link_to "Markdown 形式 (.md)", download_image_path(@image, format: "md") %></li>
+  </ul>
 <% end %>
 
 <p>

@@ -13,6 +13,10 @@ Rails.application.routes.draw do
   resources :images, only: %i[index show new create destroy] do
     member do
       post :retry
+      get :download
+    end
+    collection do
+      get :download_all
     end
   end
 

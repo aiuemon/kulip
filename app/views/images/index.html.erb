@@ -1,6 +1,18 @@
 <h1>画像一覧</h1>
 
-<p><%= link_to "新規アップロード", new_image_path %></p>
+<p>
+  <%= link_to "新規アップロード", new_image_path %>
+</p>
+
+<% completed_count = @images.select(&:completed?).count %>
+<% if completed_count > 0 %>
+  <h2>一括ダウンロード</h2>
+  <p>
+    完了した <%= completed_count %> 件の結果をダウンロード:
+    <%= link_to "テキスト形式 (ZIP)", download_all_images_path(format: "txt") %> |
+    <%= link_to "Markdown 形式 (ZIP)", download_all_images_path(format: "md") %>
+  </p>
+<% end %>
 
 <% if @images.any? %>
   <table>
@@ -39,6 +51,9 @@
           <td><%= l(image.created_at, format: :long) %></td>
           <td>
             <%= link_to "詳細", image_path(image) %>
+            <% if image.completed? && image.ocr_result.present? %>
+              <%= link_to "DL", download_image_path(image, format: "txt"), title: "ダウンロード" %>
+            <% end %>
             <%= link_to "削除", image_path(image), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" } %>
           </td>
         </tr>

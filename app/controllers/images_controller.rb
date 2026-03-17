@@ -1,6 +1,6 @@
 class ImagesController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_image, only: %i[show destroy retry]
+  before_action :set_image, only: %i[show destroy retry download]
 
   def index
     @images = current_user.images.recent.with_attached_file
@@ -50,9 +50,65 @@ class ImagesController < ApplicationController
     end
   end
 
+  def download
+    unless @image.completed? && @image.ocr_result.present?
+      redirect_to image_path(@image), alert: "ダウンロードできる結果がありません。"
+      return
+    end
+
+    format = params[:format] || "txt"
+    content, filename, content_type = generate_download_content(@image, format)
+
+    send_data content, filename: filename, type: content_type, disposition: "attachment"
+  end
+
+  def download_all
+    images = current_user.images.where(status: "completed").where.not(ocr_result: nil)
+
+    if images.empty?
+      redirect_to images_path, alert: "ダウンロードできる結果がありません。"
+      return
+    end
+
+    format = params[:format] || "txt"
+    zip_data = generate_zip(images, format)
+
+    send_data zip_data, filename: "ocr_results_#{Time.current.strftime('%Y%m%d%H%M%S')}.zip",
+                        type: "application/zip", disposition: "attachment"
+  end
+
   private
 
   def set_image
     @image = current_user.images.find(params[:id])
+  end
+
+  def generate_download_content(image, format)
+    base_name = File.basename(image.name, ".*")
+
+    case format
+    when "md", "markdown"
+      content = "# #{image.name}\n\n#{image.ocr_result}"
+      [ content, "#{base_name}.md", "text/markdown" ]
+    when "txt", "text"
+      [ image.ocr_result, "#{base_name}.txt", "text/plain" ]
+    else
+      [ image.ocr_result, "#{base_name}.txt", "text/plain" ]
+    end
+  end
+
+  def generate_zip(images, format)
+    require "zip"
+
+    stringio = Zip::OutputStream.write_buffer do |zio|
+      images.each do |image|
+        content, filename, = generate_download_content(image, format)
+        zio.put_next_entry(filename)
+        zio.write(content)
+      end
+    end
+
+    stringio.rewind
+    stringio.read
   end
 end
