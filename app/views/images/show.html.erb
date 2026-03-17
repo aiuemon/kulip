@@ -1,0 +1,35 @@
+<h1><%= @image.name %></h1>
+
+<dl>
+  <dt>ステータス</dt>
+  <dd>
+    <% case @image.status %>
+    <% when "pending" %>
+      待機中
+    <% when "processing" %>
+      処理中
+    <% when "completed" %>
+      完了
+    <% when "failed" %>
+      失敗
+    <% end %>
+  </dd>
+
+  <dt>アップロード日時</dt>
+  <dd><%= l(@image.created_at, format: :long) %></dd>
+</dl>
+
+<% if @image.file.attached? && @image.file.content_type.start_with?("image/") %>
+  <h2>画像</h2>
+  <%= image_tag @image.file %>
+<% end %>
+
+<% if @image.ocr_result.present? %>
+  <h2>OCR 結果</h2>
+  <pre><%= @image.ocr_result %></pre>
+<% end %>
+
+<p>
+  <%= link_to "一覧に戻る", images_path %>
+  <%= link_to "削除", image_path(@image), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" } %>
+</p>

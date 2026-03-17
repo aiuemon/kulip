@@ -2,6 +2,11 @@
 
 <p>ようこそ、<%= current_user.email %> さん</p>
 
+<h2>メニュー</h2>
+<ul>
+  <li><%= link_to "画像一覧", images_path %></li>
+</ul>
+
 <% if current_user.admin? %>
   <h2>管理者メニュー</h2>
   <ul>
