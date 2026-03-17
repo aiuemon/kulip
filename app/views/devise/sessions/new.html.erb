@@ -34,7 +34,7 @@
       <li>
         <% if idp.omniauth_route_available? %>
           <%= button_to idp.name,
-              user_omniauth_authorize_path(idp.omniauth_provider_name),
+              omniauth_authorize_path(:user, idp.omniauth_provider_name),
               method: :post,
               data: { turbo: false } %>
         <% else %>

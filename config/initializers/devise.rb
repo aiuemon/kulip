@@ -278,36 +278,44 @@ Devise.setup do |config|
   # DB から IdP を読み込んで OmniAuth プロバイダを設定
   # 注意: IdP を追加・変更した後はアプリの再起動が必要
   begin
-    if defined?(IdentityProvider) && ActiveRecord::Base.connection.table_exists?("identity_providers")
-      IdentityProvider.enabled.find_each do |idp|
-      case idp.provider_type
-      when "saml"
-        config.omniauth :saml,
-          name: "saml_#{idp.slug}",
-          idp_sso_service_url: idp.settings["idp_sso_url"],
-          idp_slo_service_url: idp.settings["idp_slo_url"],
-          idp_cert: idp.settings["idp_cert"],
-          sp_entity_id: idp.settings["sp_entity_id"] || "kulip",
-          name_identifier_format: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
-          attribute_statements: {
-            email: [ "email", "mail", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" ]
-          }
-      when "oidc"
-        config.omniauth :openid_connect,
-          name: "oidc_#{idp.slug}",
-          scope: %i[openid email profile],
-          response_type: :code,
-          issuer: idp.settings["issuer"],
-          discovery: true,
-          client_options: {
-            identifier: idp.settings["client_id"],
-            secret: idp.settings["client_secret"],
-            redirect_uri: idp.settings["redirect_uri"]
-          }
-      end
+    connection = ActiveRecord::Base.connection
+    if connection.table_exists?("identity_providers")
+      # モデルを使わず直接SQLで読み込む（初期化時のロード順序問題を回避）
+      rows = connection.execute("SELECT slug, provider_type, settings FROM identity_providers WHERE enabled = 1")
+      rows.each do |row|
+        slug = row["slug"]
+        provider_type = row["provider_type"]
+        settings = JSON.parse(row["settings"] || "{}")
+
+        case provider_type
+        when "saml"
+          config.omniauth :saml,
+            name: "saml_#{slug}",
+            idp_sso_service_url: settings["idp_sso_url"],
+            idp_slo_service_url: settings["idp_slo_url"],
+            idp_sso_service_binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+            idp_cert: settings["idp_cert"],
+            sp_entity_id: settings["sp_entity_id"] || "kulip",
+            name_identifier_format: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+            attribute_statements: {
+              email: [ "email", "mail", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" ]
+            }
+        when "oidc"
+          config.omniauth :openid_connect,
+            name: "oidc_#{slug}",
+            scope: %i[openid email profile],
+            response_type: :code,
+            issuer: settings["issuer"],
+            discovery: true,
+            client_options: {
+              identifier: settings["client_id"],
+              secret: settings["client_secret"],
+              redirect_uri: settings["redirect_uri"]
+            }
+        end
       end
     end
-  rescue StandardError
+  rescue ActiveRecord::NoDatabaseError, ActiveRecord::StatementInvalid
     # マイグレーション前やテーブルが存在しない場合はスキップ
   end
 
