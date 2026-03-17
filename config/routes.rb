@@ -9,6 +9,9 @@ Rails.application.routes.draw do
   # ダッシュボード（ルート）
   root "dashboard#index"
 
+  # 画像
+  resources :images, only: %i[index show new create destroy]
+
   # 管理者画面
   namespace :admin do
     resources :identity_providers

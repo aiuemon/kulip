@@ -1,0 +1,52 @@
+<h1>画像一覧</h1>
+
+<p><%= link_to "新規アップロード", new_image_path %></p>
+
+<% if @images.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th>サムネイル</th>
+        <th>ファイル名</th>
+        <th>ステータス</th>
+        <th>アップロード日時</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @images.each do |image| %>
+        <tr>
+          <td>
+            <% if image.file.attached? && image.file.content_type.start_with?("image/") %>
+              <%= image_tag image.file.variant(resize_to_limit: [100, 100]) %>
+            <% else %>
+              -
+            <% end %>
+          </td>
+          <td><%= image.name %></td>
+          <td>
+            <% case image.status %>
+            <% when "pending" %>
+              待機中
+            <% when "processing" %>
+              処理中
+            <% when "completed" %>
+              完了
+            <% when "failed" %>
+              失敗
+            <% end %>
+          </td>
+          <td><%= l(image.created_at, format: :long) %></td>
+          <td>
+            <%= link_to "詳細", image_path(image) %>
+            <%= link_to "削除", image_path(image), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>画像がありません。</p>
+<% end %>
+
+<p><%= link_to "ダッシュボードに戻る", dashboard_path %></p>
