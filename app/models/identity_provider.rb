@@ -25,6 +25,10 @@ class IdentityProvider < ApplicationRecord
     "#{provider_type}_#{slug}".to_sym
   end
 
+  def omniauth_route_available?
+    Devise.omniauth_configs.key?(omniauth_provider_name)
+  end
+
   private
 
   def generate_slug

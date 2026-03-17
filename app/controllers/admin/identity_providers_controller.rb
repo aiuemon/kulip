@@ -45,6 +45,23 @@ module Admin
         notice: "IdP を削除しました。設定を反映するにはアプリを再起動してください。"
     end
 
+    def restart_app
+      if Rails.env.development?
+        # tmp/restart.txt をタッチして再起動をトリガー
+        FileUtils.touch(Rails.root.join("tmp/restart.txt"))
+
+        # Puma を再起動（バックグラウンドで新しいサーバーを起動し、現在のプロセスを終了）
+        pid = spawn("cd #{Rails.root} && sleep 1 && bin/rails server -p 3000", [:out, :err] => "/dev/null")
+        Process.detach(pid)
+
+        # 現在のサーバーを終了
+        Thread.new { sleep 0.5; Process.kill("TERM", Process.pid) }
+      end
+
+      redirect_to admin_identity_providers_path,
+        notice: "アプリを再起動中です。3秒後に自動でリロードします。"
+    end
+
     private
 
     def set_identity_provider

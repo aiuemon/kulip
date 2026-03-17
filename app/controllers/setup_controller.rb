@@ -1,5 +1,6 @@
 class SetupController < ApplicationController
   skip_before_action :require_setup_completed
+  skip_before_action :authenticate_user!
   before_action :redirect_if_setup_completed
 
   def new

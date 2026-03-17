@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   }
 
   # 初回セットアップ
-  resource :setup, only: %i[new create]
+  resource :setup, only: %i[new create], controller: "setup"
 
   # ダッシュボード（ルート）
   root "dashboard#index"
@@ -22,7 +22,11 @@ Rails.application.routes.draw do
 
   # 管理者画面
   namespace :admin do
-    resources :identity_providers
+    resources :identity_providers do
+      collection do
+        post :restart_app
+      end
+    end
     resource :auth_settings, only: %i[show update]
   end
 
