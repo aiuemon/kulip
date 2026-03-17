@@ -51,7 +51,7 @@ module Admin
         FileUtils.touch(Rails.root.join("tmp/restart.txt"))
 
         # Puma を再起動（バックグラウンドで新しいサーバーを起動し、現在のプロセスを終了）
-        pid = spawn("cd #{Rails.root} && sleep 1 && bin/rails server -p 3000", [:out, :err] => "/dev/null")
+        pid = spawn("cd #{Rails.root} && sleep 1 && bin/rails server -p 3000", [ :out, :err ] => "/dev/null")
         Process.detach(pid)
 
         # 現在のサーバーを終了

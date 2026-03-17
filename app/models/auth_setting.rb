@@ -11,4 +11,8 @@ class AuthSetting < ApplicationRecord
   def self.local_auth_show_on_login?
     instance.local_auth_show_on_login
   end
+
+  def self.self_signup_enabled?
+    instance.self_signup_enabled
+  end
 end
