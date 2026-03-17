@@ -1,0 +1,46 @@
+<h2>ログイン</h2>
+
+<% if AuthSetting.local_auth_enabled? && AuthSetting.local_auth_show_on_login? %>
+  <h3>メールアドレスでログイン</h3>
+  <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+    <div>
+      <%= f.label :email, "メールアドレス" %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+    </div>
+
+    <div>
+      <%= f.label :password, "パスワード" %>
+      <%= f.password_field :password, autocomplete: "current-password" %>
+    </div>
+
+    <% if devise_mapping.rememberable? %>
+      <div>
+        <%= f.check_box :remember_me %>
+        <%= f.label :remember_me, "ログイン状態を保持" %>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.submit "ログイン" %>
+    </div>
+  <% end %>
+<% end %>
+
+<% visible_idps = IdentityProvider.enabled.visible_on_login %>
+<% if visible_idps.any? %>
+  <h3>外部サービスでログイン</h3>
+  <ul>
+    <% visible_idps.each do |idp| %>
+      <li>
+        <%= button_to idp.name,
+            user_omniauth_authorize_path(idp.omniauth_provider_name),
+            method: :post,
+            data: { turbo: false } %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
+<% unless AuthSetting.local_auth_show_on_login? || visible_idps.any? %>
+  <p>利用可能なログイン方法がありません。管理者に連絡してください。</p>
+<% end %>

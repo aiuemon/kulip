@@ -10,7 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_16_044132) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_17_062824) do
+  create_table "auth_settings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "local_auth_enabled", default: true, null: false
+    t.boolean "local_auth_show_on_login", default: true, null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "identity_providers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "enabled", default: false, null: false
+    t.string "name", null: false
+    t.string "provider_type", null: false
+    t.json "settings", default: {}, null: false
+    t.boolean "show_on_login", default: true, null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["enabled"], name: "index_identity_providers_on_enabled"
+    t.index ["provider_type"], name: "index_identity_providers_on_provider_type"
+    t.index ["slug"], name: "index_identity_providers_on_slug", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.boolean "admin", default: false, null: false
     t.datetime "created_at", null: false

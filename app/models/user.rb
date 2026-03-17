@@ -3,7 +3,7 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable
   devise :database_authenticatable,
          :recoverable, :rememberable, :validatable,
-         :omniauthable, omniauth_providers: %i[saml openid_connect]
+         :omniauthable
 
   def self.from_omniauth(auth)
     # メールアドレスで既存ユーザーを検索、なければ作成

@@ -1,0 +1,23 @@
+<h1><%= @identity_provider.name %></h1>
+
+<dl>
+  <dt>種別</dt>
+  <dd><%= @identity_provider.provider_type.upcase %></dd>
+
+  <dt>スラッグ</dt>
+  <dd><%= @identity_provider.slug %></dd>
+
+  <dt>有効</dt>
+  <dd><%= @identity_provider.enabled? ? "有効" : "無効" %></dd>
+
+  <dt>ログイン画面に表示</dt>
+  <dd><%= @identity_provider.show_on_login? ? "表示" : "非表示" %></dd>
+
+  <dt>設定</dt>
+  <dd><pre><%= JSON.pretty_generate(@identity_provider.settings) %></pre></dd>
+</dl>
+
+<p>
+  <%= link_to "編集", edit_admin_identity_provider_path(@identity_provider) %> |
+  <%= link_to "戻る", admin_identity_providers_path %>
+</p>

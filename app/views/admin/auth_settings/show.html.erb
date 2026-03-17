@@ -1,0 +1,39 @@
+<h1>認証設定</h1>
+
+<%= form_with model: @auth_setting, url: admin_auth_settings_path, method: :patch do |f| %>
+  <% if @auth_setting.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= @auth_setting.errors.count %>件のエラーがあります:</h2>
+      <ul>
+        <% @auth_setting.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <h2>ローカル認証</h2>
+
+  <div>
+    <%= f.label :local_auth_enabled, "ローカル認証を有効にする" %>
+    <%= f.check_box :local_auth_enabled %>
+  </div>
+
+  <div>
+    <%= f.label :local_auth_show_on_login, "ログイン画面にローカル認証フォームを表示" %>
+    <%= f.check_box :local_auth_show_on_login %>
+  </div>
+
+  <h2>外部 IdP</h2>
+  <p>
+    登録済み IdP: <%= IdentityProvider.count %> 件
+    （有効: <%= IdentityProvider.enabled.count %> 件）
+  </p>
+  <p><%= link_to "IdP 設定を管理", admin_identity_providers_path %></p>
+
+  <div>
+    <%= f.submit "保存" %>
+  </div>
+<% end %>
+
+<p><%= link_to "ダッシュボードへ戻る", root_path %></p>

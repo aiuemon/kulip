@@ -1,0 +1,104 @@
+<%= form_with model: [:admin, @identity_provider] do |f| %>
+  <% if @identity_provider.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= @identity_provider.errors.count %>件のエラーがあります:</h2>
+      <ul>
+        <% @identity_provider.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= f.hidden_field :provider_type %>
+
+  <div>
+    <%= f.label :name, "表示名" %>
+    <%= f.text_field :name, required: true %>
+  </div>
+
+  <div>
+    <%= f.label :slug, "スラッグ（URL用識別子）" %>
+    <%= f.text_field :slug, placeholder: "自動生成されます" %>
+    <small>英小文字、数字、ハイフン、アンダースコアのみ</small>
+  </div>
+
+  <div>
+    <%= f.label :enabled, "有効" %>
+    <%= f.check_box :enabled %>
+  </div>
+
+  <div>
+    <%= f.label :show_on_login, "ログイン画面に表示" %>
+    <%= f.check_box :show_on_login %>
+  </div>
+
+  <hr>
+  <h3><%= @identity_provider.provider_type&.upcase %> 設定</h3>
+
+  <% if @identity_provider.provider_type == "saml" %>
+    <div>
+      <%= label_tag "settings_idp_sso_url", "IdP SSO URL" %>
+      <%= text_field_tag "identity_provider[settings][idp_sso_url]",
+          @identity_provider.settings&.dig("idp_sso_url"),
+          id: "settings_idp_sso_url", required: true %>
+    </div>
+
+    <div>
+      <%= label_tag "settings_idp_slo_url", "IdP SLO URL（任意）" %>
+      <%= text_field_tag "identity_provider[settings][idp_slo_url]",
+          @identity_provider.settings&.dig("idp_slo_url"),
+          id: "settings_idp_slo_url" %>
+    </div>
+
+    <div>
+      <%= label_tag "settings_idp_cert", "IdP 証明書" %>
+      <%= text_area_tag "identity_provider[settings][idp_cert]",
+          @identity_provider.settings&.dig("idp_cert"),
+          id: "settings_idp_cert", rows: 10 %>
+    </div>
+
+    <div>
+      <%= label_tag "settings_sp_entity_id", "SP エンティティ ID" %>
+      <%= text_field_tag "identity_provider[settings][sp_entity_id]",
+          @identity_provider.settings&.dig("sp_entity_id") || "kulip",
+          id: "settings_sp_entity_id" %>
+    </div>
+
+  <% elsif @identity_provider.provider_type == "oidc" %>
+    <div>
+      <%= label_tag "settings_issuer", "Issuer URL" %>
+      <%= text_field_tag "identity_provider[settings][issuer]",
+          @identity_provider.settings&.dig("issuer"),
+          id: "settings_issuer", required: true %>
+    </div>
+
+    <div>
+      <%= label_tag "settings_client_id", "Client ID" %>
+      <%= text_field_tag "identity_provider[settings][client_id]",
+          @identity_provider.settings&.dig("client_id"),
+          id: "settings_client_id", required: true %>
+    </div>
+
+    <div>
+      <%= label_tag "settings_client_secret", "Client Secret" %>
+      <%= password_field_tag "identity_provider[settings][client_secret]",
+          @identity_provider.settings&.dig("client_secret"),
+          id: "settings_client_secret", required: true %>
+    </div>
+
+    <div>
+      <%= label_tag "settings_redirect_uri", "Redirect URI" %>
+      <%= text_field_tag "identity_provider[settings][redirect_uri]",
+          @identity_provider.settings&.dig("redirect_uri"),
+          id: "settings_redirect_uri",
+          placeholder: "#{request.base_url}/users/auth/oidc_#{@identity_provider.slug || 'SLUG'}/callback" %>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.submit %>
+  </div>
+<% end %>
+
+<p><%= link_to "戻る", admin_identity_providers_path %></p>
