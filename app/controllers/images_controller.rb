@@ -1,6 +1,6 @@
 class ImagesController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_image, only: %i[show destroy]
+  before_action :set_image, only: %i[show destroy retry]
 
   def index
     @images = current_user.images.recent.with_attached_file
@@ -40,6 +40,14 @@ class ImagesController < ApplicationController
   def destroy
     @image.destroy
     redirect_to images_path, notice: "画像を削除しました。"
+  end
+
+  def retry
+    if @image.retry_ocr!
+      redirect_to image_path(@image), notice: "OCR 処理を再実行しました。"
+    else
+      redirect_to image_path(@image), alert: "OCR 処理を再実行できません。"
+    end
   end
 
   private
