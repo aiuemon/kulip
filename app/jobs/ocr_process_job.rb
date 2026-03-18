@@ -19,6 +19,8 @@ class OcrProcessJob < ApplicationJob
   def process_image(image)
     image.update!(status: "processing")
 
+    start_time = Time.current
+
     client = OcrApiClient.new
     result = client.transcribe(
       image_data: image.file.download,
@@ -26,8 +28,14 @@ class OcrProcessJob < ApplicationJob
       content_type: image.file.content_type
     )
 
-    # OcrApiClient#transcribe は既にテキストを返す
-    image.update!(status: "completed", ocr_result: result)
+    duration = (Time.current - start_time).to_i
+
+    image.update!(
+      status: "completed",
+      ocr_result: result,
+      ocr_duration: duration,
+      ocr_completed_at: Time.current
+    )
 
   rescue OcrApiClient::Error => e
     Rails.logger.error "OCR processing failed for image #{image.id}: #{e.message}"

@@ -1,0 +1,51 @@
+<h1>画像一覧</h1>
+
+<p><%= info_tag(@pagy) %></p>
+
+<table>
+  <thead>
+    <tr>
+      <th><%= sort_link("ID", :id, @sort, @dir) %></th>
+      <th><%= sort_link("ファイル名", :name, @sort, @dir) %></th>
+      <th>作成ユーザ</th>
+      <th><%= sort_link("ステータス", :status, @sort, @dir) %></th>
+      <th><%= sort_link("処理時間", :ocr_duration, @sort, @dir) %></th>
+      <th><%= sort_link("文字起こし日時", :ocr_completed_at, @sort, @dir) %></th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @images.each do |image| %>
+      <tr>
+        <td><%= image.id %></td>
+        <td><%= image.name %></td>
+        <td><%= image.user.name.presence || image.user.email %></td>
+        <td>
+          <% case image.status %>
+          <% when "pending" %>
+            待機中
+          <% when "processing" %>
+            処理中
+          <% when "completed" %>
+            完了
+          <% when "failed" %>
+            失敗
+          <% end %>
+        </td>
+        <td><%= format_duration(image.ocr_duration) %></td>
+        <td><%= image.ocr_completed_at&.strftime("%Y-%m-%d %H:%M:%S") || "-" %></td>
+        <td>
+          <%= link_to "削除", admin_image_path(image),
+              data: {
+                turbo_method: :delete,
+                turbo_confirm: "この画像を削除しますか？"
+              } %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%== series_nav(@pagy) %>
+
+<p><%= link_to "ダッシュボードへ戻る", root_path %></p>

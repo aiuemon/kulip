@@ -5,11 +5,13 @@
 </p>
 
 <% if @image_groups.any? %>
+  <p><%= info_tag(@pagy) %></p>
+
   <table>
     <thead>
       <tr>
-        <th>ID</th>
-        <th>日時</th>
+        <th><%= sort_link("ID", :id, @sort, @dir) %></th>
+        <th><%= sort_link("日時", :created_at, @sort, @dir) %></th>
         <th>画像数</th>
         <th>ステータス</th>
         <th>メモ</th>
@@ -35,6 +37,8 @@
       <% end %>
     </tbody>
   </table>
+
+  <%== series_nav(@pagy) %>
 <% else %>
   <p>アップロードされた画像がありません。</p>
 <% end %>

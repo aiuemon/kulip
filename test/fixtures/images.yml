@@ -2,12 +2,16 @@
 
 one:
   user: one
-  name: MyString
-  status: MyString
-  ocr_result: MyText
+  name: test_image_1.png
+  status: completed
+  ocr_result: Sample OCR result text
+  ocr_duration: 5
+  ocr_completed_at: <%= Time.current %>
 
 two:
   user: two
-  name: MyString
-  status: MyString
-  ocr_result: MyText
+  name: test_image_2.png
+  status: pending
+  ocr_result:
+  ocr_duration:
+  ocr_completed_at:

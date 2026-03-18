@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_18_125527) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_18_143525) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -73,6 +73,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_125527) do
     t.datetime "created_at", null: false
     t.integer "image_group_id"
     t.string "name"
+    t.datetime "ocr_completed_at"
+    t.integer "ocr_duration"
     t.text "ocr_result"
     t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
@@ -98,6 +100,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_125527) do
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
+    t.string "name"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"

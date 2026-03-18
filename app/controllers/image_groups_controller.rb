@@ -2,8 +2,18 @@ class ImageGroupsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_image_group, only: %i[show destroy download]
 
+  SORTABLE_COLUMNS = %w[id created_at].freeze
+  DEFAULT_SORT = "created_at".freeze
+  DEFAULT_DIR = "desc".freeze
+
   def index
-    @image_groups = current_user.image_groups.recent.includes(images: { file_attachment: :blob })
+    @sort = SORTABLE_COLUMNS.include?(params[:sort]) ? params[:sort] : DEFAULT_SORT
+    @dir = %w[asc desc].include?(params[:dir]) ? params[:dir] : DEFAULT_DIR
+
+    scope = current_user.image_groups.includes(images: { file_attachment: :blob })
+    scope = scope.order(@sort => @dir)
+
+    @pagy, @image_groups = pagy(scope)
   end
 
   def show
