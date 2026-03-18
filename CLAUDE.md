@@ -13,8 +13,37 @@
 ```
 
 - **kulip**: フロントエンド Web サーバ（本リポジトリ）
-- **文字起こし API**: 画像を POST すると Markdown 等で文字起こし結果を返す外部 API
+- **文字起こし API**: 画像を POST すると Markdown 等で文字起こし結果を返す外部 API（Ollama 互換）
 - **IdP**: 組織の ID プロバイダ（SAML または OIDC 対応）
+
+## OCR API 設定
+
+管理者画面 (`/admin/ocr_settings`) から以下の設定が可能:
+
+| 設定項目 | 説明 |
+|----------|------|
+| endpoint | API エンドポイント URL（例: `http://localhost:11434/api/generate`） |
+| api_key | API 認証キー（Bearer トークン、任意） |
+| timeout | リクエストタイムアウト（秒、デフォルト: 300） |
+| model | VLM モデル名（例: `llava:latest`） |
+| prompt | 文字起こし用プロンプト |
+| options | temperature, num_predict 等の JSON オプション |
+
+### API リクエスト形式
+
+Ollama 互換の JSON 形式でリクエスト:
+
+```json
+{
+  "model": "モデル名",
+  "prompt": "プロンプト",
+  "images": ["Base64エンコード画像"],
+  "stream": true,
+  "options": { "temperature": 0.4, ... }
+}
+```
+
+レスポンスは NDJSON（改行区切り JSON）形式のストリーミング。
 
 ## プロジェクトフェーズ
 
