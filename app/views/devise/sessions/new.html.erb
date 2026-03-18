@@ -1,54 +1,70 @@
-<h2>ログイン</h2>
-
-<% if AuthSetting.local_auth_enabled? && AuthSetting.local_auth_show_on_login? %>
-  <h3>メールアドレスでログイン</h3>
-  <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-    <div>
-      <%= f.label :email, "メールアドレス" %>
-      <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
-    </div>
-
-    <div>
-      <%= f.label :password, "パスワード" %>
-      <%= f.password_field :password, autocomplete: "current-password" %>
-    </div>
-
-    <% if devise_mapping.rememberable? %>
-      <div>
-        <%= f.check_box :remember_me %>
-        <%= f.label :remember_me, "ログイン状態を保持" %>
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-4">
+    <div class="card mt-5">
+      <div class="card-header text-center">
+        <h2 class="mb-0">ログイン</h2>
       </div>
-    <% end %>
+      <div class="card-body">
+        <% if AuthSetting.local_auth_enabled? && AuthSetting.local_auth_show_on_login? %>
+          <h5 class="card-title">メールアドレスでログイン</h5>
+          <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+            <div class="mb-3">
+              <%= f.label :email, "メールアドレス", class: "form-label" %>
+              <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "form-control" %>
+            </div>
 
-    <div>
-      <%= f.submit "ログイン" %>
-    </div>
-  <% end %>
-<% end %>
+            <div class="mb-3">
+              <%= f.label :password, "パスワード", class: "form-label" %>
+              <%= f.password_field :password, autocomplete: "current-password", class: "form-control" %>
+            </div>
 
-<% visible_idps = IdentityProvider.enabled.visible_on_login %>
-<% if visible_idps.any? %>
-  <h3>外部サービスでログイン</h3>
-  <ul>
-    <% visible_idps.each do |idp| %>
-      <li>
-        <% if idp.omniauth_route_available? %>
-          <%= button_to idp.name,
-              omniauth_authorize_path(:user, idp.omniauth_provider_name),
-              method: :post,
-              data: { turbo: false } %>
-        <% else %>
-          <span><%= idp.name %>（アプリ再起動が必要）</span>
+            <% if devise_mapping.rememberable? %>
+              <div class="mb-3 form-check">
+                <%= f.check_box :remember_me, class: "form-check-input" %>
+                <%= f.label :remember_me, "ログイン状態を保持", class: "form-check-label" %>
+              </div>
+            <% end %>
+
+            <div class="d-grid">
+              <%= f.submit "ログイン", class: "btn btn-primary" %>
+            </div>
+          <% end %>
         <% end %>
-      </li>
-    <% end %>
-  </ul>
-<% end %>
 
-<% unless AuthSetting.local_auth_show_on_login? || visible_idps.any? %>
-  <p>利用可能なログイン方法がありません。管理者に連絡してください。</p>
-<% end %>
+        <% visible_idps = IdentityProvider.enabled.visible_on_login %>
+        <% if visible_idps.any? %>
+          <% if AuthSetting.local_auth_enabled? && AuthSetting.local_auth_show_on_login? %>
+            <hr>
+          <% end %>
+          <h5 class="card-title">外部サービスでログイン</h5>
+          <div class="d-grid gap-2">
+            <% visible_idps.each do |idp| %>
+              <% if idp.omniauth_route_available? %>
+                <%= button_to idp.name,
+                    omniauth_authorize_path(:user, idp.omniauth_provider_name),
+                    method: :post,
+                    class: "btn btn-outline-secondary",
+                    data: { turbo: false } %>
+              <% else %>
+                <button class="btn btn-outline-secondary" disabled>
+                  <%= idp.name %>（アプリ再起動が必要）
+                </button>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
 
-<% if AuthSetting.self_signup_enabled? %>
-  <p><%= link_to "アカウントをお持ちでない方はこちら", new_user_registration_path %></p>
-<% end %>
+        <% unless AuthSetting.local_auth_show_on_login? || visible_idps.any? %>
+          <div class="alert alert-warning">
+            利用可能なログイン方法がありません。管理者に連絡してください。
+          </div>
+        <% end %>
+      </div>
+      <% if AuthSetting.self_signup_enabled? %>
+        <div class="card-footer text-center">
+          <%= link_to "アカウントをお持ちでない方はこちら", new_user_registration_path %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

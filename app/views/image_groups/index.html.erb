@@ -1,46 +1,49 @@
-<h1>アップロード一覧</h1>
-
-<p>
-  <%= link_to "新規アップロード", new_image_group_path %>
-</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>アップロード一覧</h1>
+  <%= link_to "新規アップロード", new_image_group_path, class: "btn btn-primary" %>
+</div>
 
 <% if @image_groups.any? %>
-  <p><%== @pagy.info_tag %></p>
+  <p class="text-muted"><%== @pagy.info_tag %></p>
 
-  <table>
-    <thead>
-      <tr>
-        <th><%= sort_link("ID", :id, @sort, @dir) %></th>
-        <th><%= sort_link("日時", :created_at, @sort, @dir) %></th>
-        <th>画像数</th>
-        <th>ステータス</th>
-        <th>メモ</th>
-        <th>操作</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @image_groups.each do |group| %>
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead class="table-dark">
         <tr>
-          <td><%= link_to group.id, image_group_path(group) %></td>
-          <td><%= group.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
-          <td><%= group.images_count %> 件</td>
-          <td><%= group.status_summary %></td>
-          <td><%= group.memo %></td>
-          <td>
-            <%= link_to "詳細", image_group_path(group) %>
-            <% if group.completed_count > 0 %>
-              | <%= link_to "DL", download_image_group_path(group, format: "txt"), title: "テキスト形式でダウンロード" %>
-            <% end %>
-            | <%= link_to "削除", image_group_path(group), data: { turbo_method: :delete, turbo_confirm: "グループ内の全ての画像も削除されます。本当に削除しますか？" } %>
-          </td>
+          <th><%= sort_link("ID", :id, @sort, @dir) %></th>
+          <th><%= sort_link("日時", :created_at, @sort, @dir) %></th>
+          <th>画像数</th>
+          <th>ステータス</th>
+          <th>メモ</th>
+          <th>操作</th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <% @image_groups.each do |group| %>
+          <tr>
+            <td><%= link_to group.id, image_group_path(group) %></td>
+            <td><%= group.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
+            <td><%= group.images_count %> 件</td>
+            <td><%= group.status_summary %></td>
+            <td><%= group.memo %></td>
+            <td>
+              <%= link_to "詳細", image_group_path(group), class: "btn btn-sm btn-outline-primary" %>
+              <% if group.completed_count > 0 %>
+                <%= link_to "DL", download_image_group_path(group, format: "txt"), class: "btn btn-sm btn-outline-success", title: "テキスト形式でダウンロード" %>
+              <% end %>
+              <%= link_to "削除", image_group_path(group), class: "btn btn-sm btn-outline-danger", data: { turbo_method: :delete, turbo_confirm: "グループ内の全ての画像も削除されます。本当に削除しますか？" } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 
-  <%== @pagy.series_nav %>
+  <nav aria-label="ページナビゲーション">
+    <%== @pagy.series_nav %>
+  </nav>
 <% else %>
-  <p>アップロードされた画像がありません。</p>
+  <div class="alert alert-info">
+    アップロードされた画像がありません。
+  </div>
 <% end %>
-
-<p><%= link_to "ダッシュボードに戻る", root_path %></p>

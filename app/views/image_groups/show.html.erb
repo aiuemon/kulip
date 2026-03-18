@@ -1,76 +1,86 @@
-<h1>グループ #<%= @image_group.id %></h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>グループ #<%= @image_group.id %></h1>
+  <%= link_to "一覧に戻る", image_groups_path, class: "btn btn-outline-secondary" %>
+</div>
 
-<% if @image_group.memo.present? %>
-  <p>メモ: <%= @image_group.memo %></p>
-<% end %>
-
-<p>
-  ステータス: <%= @image_group.status_summary %> |
-  画像数: <%= @image_group.images_count %> 件 |
-  完了: <%= @image_group.completed_count %> 件
-</p>
+<div class="card mb-4">
+  <div class="card-body">
+    <% if @image_group.memo.present? %>
+      <p class="card-text"><strong>メモ:</strong> <%= @image_group.memo %></p>
+    <% end %>
+    <p class="card-text">
+      <span class="badge bg-secondary">画像数: <%= @image_group.images_count %> 件</span>
+      <span class="badge bg-success">完了: <%= @image_group.completed_count %> 件</span>
+      <span class="ms-2"><%= @image_group.status_summary %></span>
+    </p>
+  </div>
+</div>
 
 <% if @image_group.completed_count > 0 %>
-  <h2>一括ダウンロード</h2>
-  <p>
-    完了した <%= @image_group.completed_count %> 件の結果をダウンロード:
-    <%= link_to "テキスト形式 (ZIP)", download_image_group_path(@image_group, format: "txt") %> |
-    <%= link_to "Markdown 形式 (ZIP)", download_image_group_path(@image_group, format: "md") %>
-  </p>
+  <div class="card mb-4">
+    <div class="card-header">
+      一括ダウンロード
+    </div>
+    <div class="card-body">
+      <p class="card-text">完了した <%= @image_group.completed_count %> 件の結果をダウンロード:</p>
+      <%= link_to "テキスト形式 (ZIP)", download_image_group_path(@image_group, format: "txt"), class: "btn btn-success" %>
+      <%= link_to "Markdown 形式 (ZIP)", download_image_group_path(@image_group, format: "md"), class: "btn btn-outline-success" %>
+    </div>
+  </div>
 <% end %>
 
-<h2>画像一覧</h2>
+<h2 class="mb-3">画像一覧</h2>
 
 <% if @images.any? %>
-  <table>
-    <thead>
-      <tr>
-        <th>サムネイル</th>
-        <th>ファイル名</th>
-        <th>ステータス</th>
-        <th>操作</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @images.each do |image| %>
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead class="table-dark">
         <tr>
-          <td>
-            <% if image.file.attached? && image.file.content_type.start_with?("image/") %>
-              <%= image_tag image.file.variant(resize_to_limit: [100, 100]) %>
-            <% else %>
-              -
-            <% end %>
-          </td>
-          <td><%= image.name %></td>
-          <td>
-            <% case image.status %>
-            <% when "pending" %>
-              待機中
-            <% when "processing" %>
-              処理中
-            <% when "completed" %>
-              完了
-            <% when "failed" %>
-              失敗
-            <% end %>
-          </td>
-          <td>
-            <%= link_to "詳細", image_path(image) %>
-            <% if image.completed? && image.ocr_result.present? %>
-              | <%= link_to "DL", download_image_path(image, format: "txt"), title: "ダウンロード" %>
-            <% end %>
-            <% if image.failed? || image.pending? %>
-              | <%= link_to "再実行", retry_image_path(image), data: { turbo_method: :post } %>
-            <% end %>
-          </td>
+          <th style="width: 120px;">サムネイル</th>
+          <th>ファイル名</th>
+          <th>ステータス</th>
+          <th>操作</th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <% @images.each do |image| %>
+          <tr>
+            <td>
+              <% if image.file.attached? && image.file.content_type.start_with?("image/") %>
+                <%= image_tag image.file.variant(resize_to_limit: [100, 100]), class: "img-thumbnail" %>
+              <% else %>
+                <span class="text-muted">-</span>
+              <% end %>
+            </td>
+            <td><%= image.name %></td>
+            <td>
+              <% case image.status %>
+              <% when "pending" %>
+                <span class="badge bg-secondary">待機中</span>
+              <% when "processing" %>
+                <span class="badge bg-primary">処理中</span>
+              <% when "completed" %>
+                <span class="badge bg-success">完了</span>
+              <% when "failed" %>
+                <span class="badge bg-danger">失敗</span>
+              <% end %>
+            </td>
+            <td>
+              <%= link_to "詳細", image_path(image), class: "btn btn-sm btn-outline-primary" %>
+              <% if image.completed? && image.ocr_result.present? %>
+                <%= link_to "DL", download_image_path(image, format: "txt"), class: "btn btn-sm btn-outline-success", title: "ダウンロード" %>
+              <% end %>
+              <% if image.failed? || image.pending? %>
+                <%= link_to "再実行", retry_image_path(image), class: "btn btn-sm btn-outline-warning", data: { turbo_method: :post } %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 <% else %>
-  <p>画像がありません。</p>
+  <div class="alert alert-info">
+    画像がありません。
+  </div>
 <% end %>
-
-<p>
-  <%= link_to "一覧に戻る", image_groups_path %>
-</p>

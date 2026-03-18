@@ -1,10 +1,10 @@
-<h1>認証設定</h1>
+<h1 class="mb-4">認証設定</h1>
 
 <%= form_with model: @auth_setting, url: admin_auth_settings_path, method: :patch do |f| %>
   <% if @auth_setting.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= @auth_setting.errors.count %>件のエラーがあります:</h2>
-      <ul>
+    <div class="alert alert-danger">
+      <h5><%= @auth_setting.errors.count %>件のエラーがあります:</h5>
+      <ul class="mb-0">
         <% @auth_setting.errors.full_messages.each do |message| %>
           <li><%= message %></li>
         <% end %>
@@ -12,33 +12,42 @@
     </div>
   <% end %>
 
-  <h2>ローカル認証</h2>
+  <div class="card mb-4">
+    <div class="card-header">
+      ローカル認証
+    </div>
+    <div class="card-body">
+      <div class="form-check mb-3">
+        <%= f.check_box :local_auth_enabled, class: "form-check-input" %>
+        <%= f.label :local_auth_enabled, "ローカル認証を有効にする", class: "form-check-label" %>
+      </div>
 
-  <div>
-    <%= f.label :local_auth_enabled, "ローカル認証を有効にする" %>
-    <%= f.check_box :local_auth_enabled %>
+      <div class="form-check mb-3">
+        <%= f.check_box :local_auth_show_on_login, class: "form-check-input" %>
+        <%= f.label :local_auth_show_on_login, "ログイン画面にローカル認証フォームを表示", class: "form-check-label" %>
+      </div>
+
+      <div class="form-check">
+        <%= f.check_box :self_signup_enabled, class: "form-check-input" %>
+        <%= f.label :self_signup_enabled, "新規登録を許可する", class: "form-check-label" %>
+      </div>
+    </div>
   </div>
 
-  <div>
-    <%= f.label :local_auth_show_on_login, "ログイン画面にローカル認証フォームを表示" %>
-    <%= f.check_box :local_auth_show_on_login %>
+  <div class="card mb-4">
+    <div class="card-header">
+      外部 IdP
+    </div>
+    <div class="card-body">
+      <p class="card-text">
+        登録済み IdP: <span class="badge bg-secondary"><%= IdentityProvider.count %> 件</span>
+        （有効: <span class="badge bg-success"><%= IdentityProvider.enabled.count %> 件</span>）
+      </p>
+      <%= link_to "IdP 設定を管理", admin_identity_providers_path, class: "btn btn-outline-primary" %>
+    </div>
   </div>
 
-  <div>
-    <%= f.label :self_signup_enabled, "新規登録を許可する" %>
-    <%= f.check_box :self_signup_enabled %>
-  </div>
-
-  <h2>外部 IdP</h2>
-  <p>
-    登録済み IdP: <%= IdentityProvider.count %> 件
-    （有効: <%= IdentityProvider.enabled.count %> 件）
-  </p>
-  <p><%= link_to "IdP 設定を管理", admin_identity_providers_path %></p>
-
-  <div>
-    <%= f.submit "保存" %>
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <%= f.submit "保存", class: "btn btn-primary" %>
   </div>
 <% end %>
-
-<p><%= link_to "ダッシュボードへ戻る", root_path %></p>

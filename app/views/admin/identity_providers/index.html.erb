@@ -1,46 +1,69 @@
-<h1>IdP 設定</h1>
-
-<p>
-  <%= link_to "SAML IdP を追加", new_admin_identity_provider_path(provider_type: "saml") %> |
-  <%= link_to "OIDC IdP を追加", new_admin_identity_provider_path(provider_type: "oidc") %>
-</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>IdP 設定</h1>
+  <div>
+    <%= link_to "SAML IdP を追加", new_admin_identity_provider_path(provider_type: "saml"), class: "btn btn-primary" %>
+    <%= link_to "OIDC IdP を追加", new_admin_identity_provider_path(provider_type: "oidc"), class: "btn btn-outline-primary" %>
+  </div>
+</div>
 
 <% if @identity_providers.any? %>
-  <table>
-    <thead>
-      <tr>
-        <th>種別</th>
-        <th>名前</th>
-        <th>スラッグ</th>
-        <th>有効</th>
-        <th>ログイン画面に表示</th>
-        <th>操作</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @identity_providers.each do |idp| %>
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead class="table-dark">
         <tr>
-          <td><%= idp.provider_type.upcase %></td>
-          <td><%= idp.name %></td>
-          <td><%= idp.slug %></td>
-          <td><%= idp.enabled? ? "有効" : "無効" %></td>
-          <td><%= idp.show_on_login? ? "表示" : "非表示" %></td>
-          <td>
-            <%= link_to "編集", edit_admin_identity_provider_path(idp) %> |
-            <%= link_to "削除", admin_identity_provider_path(idp), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" } %>
-          </td>
+          <th>種別</th>
+          <th>名前</th>
+          <th>スラッグ</th>
+          <th>有効</th>
+          <th>ログイン画面に表示</th>
+          <th>操作</th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <% @identity_providers.each do |idp| %>
+          <tr>
+            <td><span class="badge bg-secondary"><%= idp.provider_type.upcase %></span></td>
+            <td><%= idp.name %></td>
+            <td><code><%= idp.slug %></code></td>
+            <td>
+              <% if idp.enabled? %>
+                <span class="badge bg-success">有効</span>
+              <% else %>
+                <span class="badge bg-secondary">無効</span>
+              <% end %>
+            </td>
+            <td>
+              <% if idp.show_on_login? %>
+                <span class="badge bg-info">表示</span>
+              <% else %>
+                <span class="text-muted">非表示</span>
+              <% end %>
+            </td>
+            <td>
+              <%= link_to "編集", edit_admin_identity_provider_path(idp), class: "btn btn-sm btn-outline-primary" %>
+              <%= link_to "削除", admin_identity_provider_path(idp), class: "btn btn-sm btn-outline-danger", data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 <% else %>
-  <p>IdP が登録されていません。</p>
+  <div class="alert alert-info">
+    IdP が登録されていません。
+  </div>
 <% end %>
 
 <% if Rails.env.development? %>
-  <h2>アプリ再起動</h2>
-  <p>IdP の追加・変更を反映するにはアプリの再起動が必要です。</p>
-  <%= button_to "アプリを再起動", restart_app_admin_identity_providers_path, data: { turbo: false, confirm: "アプリを再起動しますか？" } %>
+  <div class="card mt-4">
+    <div class="card-header">
+      アプリ再起動
+    </div>
+    <div class="card-body">
+      <p class="card-text">IdP の追加・変更を反映するにはアプリの再起動が必要です。</p>
+      <%= button_to "アプリを再起動", restart_app_admin_identity_providers_path, class: "btn btn-warning", data: { turbo: false, confirm: "アプリを再起動しますか？" } %>
+    </div>
+  </div>
 <% end %>
 
 <% if flash[:notice]&.include?("再起動中") %>
@@ -51,5 +74,6 @@
   </script>
 <% end %>
 
-<p><%= link_to "認証設定へ", admin_auth_settings_path %></p>
-<p><%= link_to "ダッシュボードへ戻る", root_path %></p>
+<div class="mt-4">
+  <%= link_to "認証設定へ", admin_auth_settings_path, class: "btn btn-outline-secondary" %>
+</div>

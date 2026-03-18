@@ -1,48 +1,70 @@
-<h1><%= @image.name %></h1>
-
-<dl>
-  <dt>ステータス</dt>
-  <dd>
-    <% case @image.status %>
-    <% when "pending" %>
-      待機中
-    <% when "processing" %>
-      処理中
-    <% when "completed" %>
-      完了
-    <% when "failed" %>
-      失敗
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1><%= @image.name %></h1>
+  <div>
+    <% if @image.image_group %>
+      <%= link_to "グループに戻る", image_group_path(@image.image_group), class: "btn btn-outline-secondary" %>
+    <% else %>
+      <%= link_to "一覧に戻る", image_groups_path, class: "btn btn-outline-secondary" %>
     <% end %>
-  </dd>
+  </div>
+</div>
 
-  <dt>アップロード日時</dt>
-  <dd><%= l(@image.created_at, format: :long) %></dd>
-</dl>
+<div class="row">
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-header">画像情報</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-4">ステータス</dt>
+          <dd class="col-sm-8">
+            <% case @image.status %>
+            <% when "pending" %>
+              <span class="badge bg-secondary">待機中</span>
+            <% when "processing" %>
+              <span class="badge bg-primary">処理中</span>
+            <% when "completed" %>
+              <span class="badge bg-success">完了</span>
+            <% when "failed" %>
+              <span class="badge bg-danger">失敗</span>
+            <% end %>
+          </dd>
 
-<% if @image.file.attached? && @image.file.content_type.start_with?("image/") %>
-  <h2>画像</h2>
-  <%= image_tag @image.file %>
-<% end %>
+          <dt class="col-sm-4">アップロード日時</dt>
+          <dd class="col-sm-8"><%= l(@image.created_at, format: :long) %></dd>
+        </dl>
+      </div>
+      <div class="card-footer">
+        <% if @image.failed? || @image.pending? %>
+          <%= link_to "再試行", retry_image_path(@image), class: "btn btn-warning btn-sm", data: { turbo_method: :post } %>
+        <% end %>
+        <%= link_to "削除", image_path(@image), class: "btn btn-danger btn-sm", data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" } %>
+      </div>
+    </div>
+  </div>
+
+  <% if @image.file.attached? && @image.file.content_type.start_with?("image/") %>
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">プレビュー</div>
+        <div class="card-body text-center">
+          <%= image_tag @image.file, class: "img-fluid", style: "max-height: 400px;" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
 
 <% if @image.ocr_result.present? %>
-  <h2>OCR 結果</h2>
-  <pre><%= @image.ocr_result %></pre>
-
-  <h3>ダウンロード</h3>
-  <ul>
-    <li><%= link_to "テキスト形式 (.txt)", download_image_path(@image, format: "txt") %></li>
-    <li><%= link_to "Markdown 形式 (.md)", download_image_path(@image, format: "md") %></li>
-  </ul>
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span>OCR 結果</span>
+      <div>
+        <%= link_to "TXT", download_image_path(@image, format: "txt"), class: "btn btn-success btn-sm" %>
+        <%= link_to "MD", download_image_path(@image, format: "md"), class: "btn btn-outline-success btn-sm" %>
+      </div>
+    </div>
+    <div class="card-body">
+      <pre class="mb-0" style="white-space: pre-wrap; word-wrap: break-word;"><%= @image.ocr_result %></pre>
+    </div>
+  </div>
 <% end %>
-
-<p>
-  <% if @image.image_group %>
-    <%= link_to "グループに戻る", image_group_path(@image.image_group) %>
-  <% else %>
-    <%= link_to "一覧に戻る", image_groups_path %>
-  <% end %>
-  <% if @image.failed? || @image.pending? %>
-    | <%= link_to "再試行", retry_image_path(@image), data: { turbo_method: :post } %>
-  <% end %>
-  | <%= link_to "削除", image_path(@image), data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" } %>
-</p>

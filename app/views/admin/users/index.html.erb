@@ -1,47 +1,56 @@
-<h1>ユーザ一覧</h1>
+<h1 class="mb-4">ユーザ一覧</h1>
 
-<p><%== @pagy.info_tag %></p>
+<p class="text-muted"><%== @pagy.info_tag %></p>
 
-<table>
-  <thead>
-    <tr>
-      <th><%= sort_link("ID", :id, @sort, @dir) %></th>
-      <th><%= sort_link("ユーザ名", :name, @sort, @dir) %></th>
-      <th><%= sort_link("メールアドレス", :email, @sort, @dir) %></th>
-      <th>文字起こし件数</th>
-      <th>累計処理時間</th>
-      <th>最終利用日時</th>
-      <th>管理者</th>
-      <th>操作</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @users.each do |user| %>
+<div class="table-responsive">
+  <table class="table table-striped table-hover">
+    <thead class="table-dark">
       <tr>
-        <td><%= user.id %></td>
-        <td><%= user.name.presence || "-" %></td>
-        <td><%= user.email %></td>
-        <td><%= user.images.where(status: "completed").count %> 件</td>
-        <td><%= format_duration(user.images.sum(:ocr_duration)) %></td>
-        <td><%= user.images.maximum(:created_at)&.strftime("%Y-%m-%d %H:%M:%S") || "-" %></td>
-        <td><%= user.admin? ? "はい" : "-" %></td>
-        <td>
-          <% if user != current_user %>
-            <%= link_to(user.admin? ? "権限解除" : "権限付与",
-                        toggle_admin_admin_user_path(user),
-                        data: {
-                          turbo_method: :patch,
-                          turbo_confirm: "#{user.email} の管理者権限を#{user.admin? ? '解除' : '付与'}しますか？"
-                        }) %>
-          <% else %>
-            (自分)
-          <% end %>
-        </td>
+        <th><%= sort_link("ID", :id, @sort, @dir) %></th>
+        <th><%= sort_link("ユーザ名", :name, @sort, @dir) %></th>
+        <th><%= sort_link("メールアドレス", :email, @sort, @dir) %></th>
+        <th>文字起こし件数</th>
+        <th>累計処理時間</th>
+        <th>最終利用日時</th>
+        <th>管理者</th>
+        <th>操作</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% @users.each do |user| %>
+        <tr>
+          <td><%= user.id %></td>
+          <td><%= user.name.presence || "-" %></td>
+          <td><%= user.email %></td>
+          <td><%= user.images.where(status: "completed").count %> 件</td>
+          <td><%= format_duration(user.images.sum(:ocr_duration)) %></td>
+          <td><%= user.images.maximum(:created_at)&.strftime("%Y-%m-%d %H:%M:%S") || "-" %></td>
+          <td>
+            <% if user.admin? %>
+              <span class="badge bg-success">はい</span>
+            <% else %>
+              <span class="text-muted">-</span>
+            <% end %>
+          </td>
+          <td>
+            <% if user != current_user %>
+              <%= link_to(user.admin? ? "権限解除" : "権限付与",
+                          toggle_admin_admin_user_path(user),
+                          class: user.admin? ? "btn btn-sm btn-outline-warning" : "btn btn-sm btn-outline-success",
+                          data: {
+                            turbo_method: :patch,
+                            turbo_confirm: "#{user.email} の管理者権限を#{user.admin? ? '解除' : '付与'}しますか？"
+                          }) %>
+            <% else %>
+              <span class="badge bg-secondary">自分</span>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
 
-<%== @pagy.series_nav %>
-
-<p><%= link_to "ダッシュボードへ戻る", root_path %></p>
+<nav aria-label="ページナビゲーション">
+  <%== @pagy.series_nav %>
+</nav>
