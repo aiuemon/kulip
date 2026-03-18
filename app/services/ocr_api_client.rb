@@ -1,6 +1,7 @@
 require "net/http"
 require "uri"
 require "json"
+require "base64"
 
 class OcrApiClient
   class Error < StandardError; end
@@ -8,24 +9,24 @@ class OcrApiClient
   class RequestError < Error; end
   class TimeoutError < Error; end
 
-  DEFAULT_TIMEOUT = 60
-
   def initialize
-    @endpoint = ENV.fetch("OCR_API_ENDPOINT") { raise ConfigurationError, "OCR_API_ENDPOINT is not set" }
-    @api_key = ENV.fetch("OCR_API_KEY") { raise ConfigurationError, "OCR_API_KEY is not set" }
-    @timeout = ENV.fetch("OCR_API_TIMEOUT", DEFAULT_TIMEOUT).to_i
+    @endpoint = OcrSetting.ocr_endpoint
+    @api_key = OcrSetting.ocr_api_key
+    @timeout = OcrSetting.ocr_timeout
+
+    raise ConfigurationError, "OCR API endpoint is not configured" if @endpoint.blank?
   end
 
   # 画像を送信して OCR 結果を取得
   # @param image_data [String] 画像のバイナリデータ
-  # @param filename [String] ファイル名
-  # @param content_type [String] Content-Type
-  # @return [Hash] OCR 結果
-  def transcribe(image_data:, filename:, content_type:)
+  # @param filename [String] ファイル名（未使用だが互換性のため残す）
+  # @param content_type [String] Content-Type（未使用だが互換性のため残す）
+  # @return [String] OCR 結果テキスト
+  def transcribe(image_data:, filename: nil, content_type: nil)
     uri = URI.parse(@endpoint)
     http = build_http_client(uri)
 
-    request = build_multipart_request(uri, image_data, filename, content_type)
+    request = build_json_request(uri, image_data)
     response = execute_request(http, request)
 
     parse_response(response)
@@ -33,7 +34,7 @@ class OcrApiClient
 
   # API の設定が有効かどうかを確認
   def self.configured?
-    ENV["OCR_API_ENDPOINT"].present? && ENV["OCR_API_KEY"].present?
+    OcrSetting.configured?
   end
 
   private
@@ -46,30 +47,24 @@ class OcrApiClient
     http
   end
 
-  def build_multipart_request(uri, image_data, filename, content_type)
-    boundary = "----RubyFormBoundary#{SecureRandom.hex(16)}"
+  def build_json_request(uri, image_data)
+    image_b64 = Base64.strict_encode64(image_data)
 
-    body = build_multipart_body(boundary, image_data, filename, content_type)
+    payload = {
+      model: OcrSetting.ocr_model,
+      prompt: OcrSetting.ocr_prompt,
+      images: [ image_b64 ],
+      stream: false,
+      options: OcrSetting.ocr_options
+    }
 
     request = Net::HTTP::Post.new(uri.request_uri)
-    request["Content-Type"] = "multipart/form-data; boundary=#{boundary}"
-    request["Authorization"] = "Bearer #{@api_key}"
+    request["Content-Type"] = "application/json"
     request["Accept"] = "application/json"
-    request.body = body
+    request["Authorization"] = "Bearer #{@api_key}" if @api_key.present?
+    request.body = payload.to_json
 
     request
-  end
-
-  def build_multipart_body(boundary, image_data, filename, content_type)
-    body = +""
-    body << "--#{boundary}\r\n"
-    body << "Content-Disposition: form-data; name=\"file\"; filename=\"#{filename}\"\r\n"
-    body << "Content-Type: #{content_type}\r\n"
-    body << "\r\n"
-    body << image_data
-    body << "\r\n"
-    body << "--#{boundary}--\r\n"
-    body
   end
 
   def execute_request(http, request)
@@ -83,7 +78,8 @@ class OcrApiClient
   def parse_response(response)
     case response.code.to_i
     when 200..299
-      JSON.parse(response.body, symbolize_names: true)
+      data = JSON.parse(response.body, symbolize_names: true)
+      extract_text(data)
     when 401
       raise RequestError, "Authentication failed: Invalid API key"
     when 404
@@ -95,5 +91,16 @@ class OcrApiClient
     else
       raise RequestError, "Unexpected response: #{response.code} - #{response.body}"
     end
+  end
+
+  # レスポンスからテキストを抽出
+  # <think>...</think> タグを除去して最終的なテキストを返す
+  def extract_text(data)
+    text = data[:response] || data[:text] || data[:content] || ""
+
+    # <think>...</think> タグを除去
+    text = text.gsub(%r{<think>.*?</think>}m, "").strip
+
+    text
   end
 end

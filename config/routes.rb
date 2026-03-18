@@ -33,6 +33,7 @@ Rails.application.routes.draw do
       end
     end
     resource :auth_settings, only: %i[show update]
+    resource :ocr_settings, only: %i[show update]
   end
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
