@@ -1,6 +1,6 @@
 <h1>画像一覧</h1>
 
-<p><%= info_tag(@pagy) %></p>
+<p><%== @pagy.info_tag %></p>
 
 <table>
   <thead>
@@ -46,6 +46,6 @@
   </tbody>
 </table>
 
-<%== series_nav(@pagy) %>
+<%== @pagy.series_nav %>
 
 <p><%= link_to "ダッシュボードへ戻る", root_path %></p>

@@ -1,6 +1,4 @@
 module ApplicationHelper
-  include Pagy::NumericHelpers
-
   def sort_link(title, column, current_sort, current_dir)
     is_current = current_sort == column.to_s
     new_dir = is_current && current_dir == "asc" ? "desc" : "asc"

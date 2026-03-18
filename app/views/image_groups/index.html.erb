@@ -5,7 +5,7 @@
 </p>
 
 <% if @image_groups.any? %>
-  <p><%= info_tag(@pagy) %></p>
+  <p><%== @pagy.info_tag %></p>
 
   <table>
     <thead>
@@ -38,7 +38,7 @@
     </tbody>
   </table>
 
-  <%== series_nav(@pagy) %>
+  <%== @pagy.series_nav %>
 <% else %>
   <p>アップロードされた画像がありません。</p>
 <% end %>
