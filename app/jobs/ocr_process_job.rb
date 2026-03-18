@@ -26,19 +26,12 @@ class OcrProcessJob < ApplicationJob
       content_type: image.file.content_type
     )
 
-    # API のレスポンス形式に応じて結果を保存
-    ocr_text = extract_text_from_result(result)
-    image.update!(status: "completed", ocr_result: ocr_text)
+    # OcrApiClient#transcribe は既にテキストを返す
+    image.update!(status: "completed", ocr_result: result)
 
   rescue OcrApiClient::Error => e
     Rails.logger.error "OCR processing failed for image #{image.id}: #{e.message}"
     image.update!(status: "failed", ocr_result: "Error: #{e.message}")
     raise
-  end
-
-  def extract_text_from_result(result)
-    # API のレスポンス形式に応じてテキストを抽出
-    # 一般的なフォーマットをサポート
-    result[:text] || result[:markdown] || result[:content] || result.to_json
   end
 end

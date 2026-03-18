@@ -54,7 +54,7 @@ class OcrApiClient
       model: OcrSetting.ocr_model,
       prompt: OcrSetting.ocr_prompt,
       images: [ image_b64 ],
-      stream: false,
+      stream: true,
       options: OcrSetting.ocr_options
     }
 
@@ -78,8 +78,7 @@ class OcrApiClient
   def parse_response(response)
     case response.code.to_i
     when 200..299
-      data = JSON.parse(response.body, symbolize_names: true)
-      extract_text(data)
+      extract_streaming_text(response.body)
     when 401
       raise RequestError, "Authentication failed: Invalid API key"
     when 404
@@ -87,20 +86,31 @@ class OcrApiClient
     when 429
       raise RequestError, "Rate limit exceeded"
     when 500..599
-      raise RequestError, "API server error: #{response.code}"
+      raise RequestError, "API server error: #{response.code} - #{response.body.to_s.truncate(500)}"
     else
       raise RequestError, "Unexpected response: #{response.code} - #{response.body}"
     end
   end
 
-  # レスポンスからテキストを抽出
-  # <think>...</think> タグを除去して最終的なテキストを返す
-  def extract_text(data)
-    text = data[:response] || data[:text] || data[:content] || ""
+  # ストリーミングレスポンス（NDJSON）からテキストを抽出
+  # 各行の response を連結し、<think>...</think> タグを除去
+  def extract_streaming_text(body)
+    text = ""
+
+    body.each_line do |line|
+      line = line.strip
+      next if line.empty?
+
+      begin
+        data = JSON.parse(line, symbolize_names: true)
+        text += data[:response] || data[:text] || data[:content] || ""
+      rescue JSON::ParserError
+        # 不正な JSON 行はスキップ
+        next
+      end
+    end
 
     # <think>...</think> タグを除去
-    text = text.gsub(%r{<think>.*?</think>}m, "").strip
-
-    text
+    text.gsub(%r{<think>.*?</think>}m, "").strip
   end
 end
