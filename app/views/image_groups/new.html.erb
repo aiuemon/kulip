@@ -2,8 +2,8 @@
 
 <%= form_with url: image_groups_path, method: :post, multipart: true do |f| %>
   <div>
-    <label for="name">グループ名（省略可）</label><br>
-    <%= text_field_tag :name, nil, placeholder: "空欄の場合は日時が設定されます" %>
+    <label for="memo">メモ（省略可）</label><br>
+    <%= text_field_tag :memo, nil, placeholder: "任意のメモを入力できます" %>
   </div>
 
   <div>

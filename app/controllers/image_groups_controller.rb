@@ -22,8 +22,7 @@ class ImageGroupsController < ApplicationController
       return
     end
 
-    group_name = params[:name].presence || "アップロード #{Time.current.strftime('%Y-%m-%d %H:%M')}"
-    @image_group = current_user.image_groups.build(name: group_name)
+    @image_group = current_user.image_groups.build(memo: params[:memo].presence)
 
     if @image_group.save
       uploaded_files.each do |file|
@@ -55,7 +54,7 @@ class ImageGroupsController < ApplicationController
 
     format = params[:format] || "txt"
     zip_data = generate_zip(images, format)
-    filename = "#{@image_group.name.gsub(/[^\w\-]/, '_')}_#{Time.current.strftime('%Y%m%d%H%M%S')}.zip"
+    filename = "group_#{@image_group.id}_#{Time.current.strftime('%Y%m%d%H%M%S')}.zip"
 
     send_data zip_data, filename: filename, type: "application/zip", disposition: "attachment"
   end

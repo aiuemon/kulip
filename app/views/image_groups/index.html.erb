@@ -8,20 +8,22 @@
   <table>
     <thead>
       <tr>
-        <th>グループ名</th>
+        <th>ID</th>
+        <th>日時</th>
         <th>画像数</th>
         <th>ステータス</th>
-        <th>アップロード日時</th>
+        <th>メモ</th>
         <th>操作</th>
       </tr>
     </thead>
     <tbody>
       <% @image_groups.each do |group| %>
         <tr>
-          <td><%= link_to group.name, image_group_path(group) %></td>
+          <td><%= link_to group.id, image_group_path(group) %></td>
+          <td><%= group.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
           <td><%= group.images_count %> 件</td>
           <td><%= group.status_summary %></td>
-          <td><%= l(group.created_at, format: :long) %></td>
+          <td><%= group.memo %></td>
           <td>
             <%= link_to "詳細", image_group_path(group) %>
             <% if group.completed_count > 0 %>

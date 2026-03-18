@@ -1,4 +1,8 @@
-<h1><%= @image_group.name %></h1>
+<h1>グループ #<%= @image_group.id %></h1>
+
+<% if @image_group.memo.present? %>
+  <p>メモ: <%= @image_group.memo %></p>
+<% end %>
 
 <p>
   ステータス: <%= @image_group.status_summary %> |

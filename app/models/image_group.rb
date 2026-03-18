@@ -2,7 +2,6 @@ class ImageGroup < ApplicationRecord
   belongs_to :user
   has_many :images, dependent: :destroy
 
-  validates :name, presence: true
 
   scope :recent, -> { order(created_at: :desc) }
 
