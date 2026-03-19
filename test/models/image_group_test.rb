@@ -49,6 +49,18 @@ class ImageGroupTest < ActiveSupport::TestCase
     assert_equal "処理中", group.status_summary
   end
 
+  test "all_failed? returns true when all images failed" do
+    group = image_groups(:group_with_images)
+    group.images.update_all(status: "failed")
+    assert group.all_failed?
+  end
+
+  test "status_summary returns failed when all images failed" do
+    group = image_groups(:group_with_images)
+    group.images.update_all(status: "failed")
+    assert_equal "失敗", group.status_summary
+  end
+
   test "recent scope orders by created_at desc" do
     groups = ImageGroup.recent
     assert groups.first.created_at >= groups.last.created_at if groups.count > 1
