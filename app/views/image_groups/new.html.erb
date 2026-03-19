@@ -4,7 +4,7 @@
 </div>
 
 <div class="card">
-  <div class="card-body">
+  <div class="card-body dropzone" data-controller="dropzone">
     <%= form_with url: image_groups_path, method: :post, multipart: true do |f| %>
       <div class="mb-3">
         <label for="memo" class="form-label">メモ（省略可）</label>
@@ -13,8 +13,12 @@
 
       <div class="mb-3">
         <label for="images" class="form-label">画像ファイル（複数選択可）</label>
-        <%= file_field_tag "images[]", multiple: true, accept: "image/*", class: "form-control" %>
-        <div class="form-text">JPEG, PNG, GIF 等の画像ファイルをアップロードできます。</div>
+        <div class="dropzone-area p-4 border border-2 border-dashed rounded text-center">
+          <p class="mb-2 text-muted">ここにファイルをドラッグ&ドロップ</p>
+          <p class="mb-2 text-muted">または</p>
+          <%= file_field_tag "images[]", multiple: true, accept: "image/*", class: "form-control", data: { dropzone_target: "input", action: "change->dropzone#onChange" } %>
+          <p class="mt-2 mb-0 text-muted small" data-dropzone-target="label">JPEG, PNG, GIF 等の画像ファイルをアップロードできます</p>
+        </div>
       </div>
 
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -23,3 +27,14 @@
     <% end %>
   </div>
 </div>
+
+<style>
+  .dropzone-area {
+    border-color: #dee2e6 !important;
+    transition: all 0.2s ease;
+  }
+  .dropzone-active .dropzone-area {
+    border-color: #0d6efd !important;
+    background-color: #e7f1ff;
+  }
+</style>
