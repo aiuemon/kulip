@@ -26,22 +26,14 @@
             <td><%= group.images_count %> 件</td>
             <td><%= group.status_summary %></td>
             <td><%= group.memo %></td>
-            <td class="text-nowrap">
-              <%= link_to image_group_path(group), class: "btn btn-sm btn-outline-primary", title: "詳細" do %>
-                <i class="bi bi-eye"></i>
-              <% end %>
+            <td>
+              <%= link_to "詳細", image_group_path(group), class: "btn btn-sm btn-outline-primary" %>
               <% if group.completed_count > 0 %>
-                <%= link_to download_image_group_path(group, format: "txt"), class: "btn btn-sm btn-outline-success", title: "ダウンロード" do %>
-                  <i class="bi bi-download"></i>
-                <% end %>
+                <%= link_to "DL", download_image_group_path(group, format: "txt"), class: "btn btn-sm btn-outline-success", title: "テキスト形式でダウンロード" %>
               <% else %>
-                <span class="btn btn-sm btn-outline-secondary disabled" title="完了した画像がありません">
-                  <i class="bi bi-download"></i>
-                </span>
+                <span class="btn btn-sm btn-outline-secondary disabled" title="完了した画像がありません">DL</span>
               <% end %>
-              <%= link_to image_group_path(group), class: "btn btn-sm btn-outline-danger", title: "削除", data: { turbo_method: :delete, turbo_confirm: "グループ内の全ての画像も削除されます。本当に削除しますか？" } do %>
-                <i class="bi bi-trash"></i>
-              <% end %>
+              <%= link_to "削除", image_group_path(group), class: "btn btn-sm btn-outline-danger", data: { turbo_method: :delete, turbo_confirm: "グループ内の全ての画像も削除されます。本当に削除しますか？" } %>
             </td>
           </tr>
         <% end %>
