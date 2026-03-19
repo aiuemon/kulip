@@ -1,9 +1,8 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  local_auth_enabled: false
-  local_auth_show_on_login: false
-
-two:
-  local_auth_enabled: false
-  local_auth_show_on_login: false
+# シングルトンなのでテストではフィクスチャを使わず first_or_create! で生成
+# 必要に応じて default を使用
+default:
+  local_auth_enabled: true
+  local_auth_show_on_login: true
+  self_signup_enabled: false

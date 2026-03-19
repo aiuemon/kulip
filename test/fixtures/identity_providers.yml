@@ -1,17 +1,32 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  provider_type: MyString
-  name: MyString
-  slug: MyString
-  enabled: false
-  show_on_login: false
-  settings: 
+saml_idp:
+  name: Test SAML IdP
+  slug: test-saml
+  provider_type: saml
+  enabled: true
+  show_on_login: true
+  settings:
+    idp_entity_id: "https://idp.example.com"
+    idp_sso_service_url: "https://idp.example.com/sso"
+    idp_cert: "MIIDdTCCAl2g..."
 
-two:
-  provider_type: MyString
-  name: MyString
-  slug: MyString
+oidc_idp:
+  name: Test OIDC IdP
+  slug: test-oidc
+  provider_type: oidc
+  enabled: true
+  show_on_login: false
+  settings:
+    issuer: "https://oidc.example.com"
+    client_id: "test-client-id"
+    client_secret: "test-client-secret"
+
+disabled_idp:
+  name: Disabled IdP
+  slug: disabled
+  provider_type: saml
   enabled: false
   show_on_login: false
-  settings: 
+  settings:
+    idp_entity_id: "https://disabled.example.com"

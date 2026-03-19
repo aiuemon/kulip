@@ -1,17 +1,37 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  user: one
-  name: test_image_1.png
+completed_image:
+  user: user
+  image_group: group_with_images
+  name: completed_image.png
   status: completed
-  ocr_result: Sample OCR result text
+  ocr_result: "# サンプルOCR結果\n\nこれはテスト用のOCR結果です。"
   ocr_duration: 5
   ocr_completed_at: <%= Time.current %>
 
-two:
-  user: two
-  name: test_image_2.png
+pending_image:
+  user: user
+  image_group: group_with_images
+  name: pending_image.png
   status: pending
+  ocr_result:
+  ocr_duration:
+  ocr_completed_at:
+
+failed_image:
+  user: user
+  image_group: group_with_images
+  name: failed_image.png
+  status: failed
+  ocr_result:
+  ocr_duration:
+  ocr_completed_at:
+
+processing_image:
+  user: admin
+  image_group: admin_group
+  name: processing_image.png
+  status: processing
   ocr_result:
   ocr_duration:
   ocr_completed_at:

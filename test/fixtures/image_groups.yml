@@ -1,9 +1,13 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  memo: MyString
-  user: one
+group_with_images:
+  memo: テスト用グループ
+  user: user
 
-two:
-  memo: MyString
-  user: two
+empty_group:
+  memo: 空のグループ
+  user: user
+
+admin_group:
+  memo: 管理者のグループ
+  user: admin

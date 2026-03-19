@@ -1,13 +1,13 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  name: テストユーザー1
-  email: user1@example.com
-  encrypted_password: <%= Devise::Encryptor.digest(User, 'password') %>
+user:
+  name: テストユーザー
+  email: user@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
   admin: false
 
-two:
-  name: テストユーザー2
-  email: user2@example.com
-  encrypted_password: <%= Devise::Encryptor.digest(User, 'password') %>
+admin:
+  name: 管理者ユーザー
+  email: admin@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
   admin: true
