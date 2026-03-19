@@ -30,6 +30,8 @@
               <%= link_to "詳細", image_group_path(group), class: "btn btn-sm btn-outline-primary" %>
               <% if group.completed_count > 0 %>
                 <%= link_to "DL", download_image_group_path(group, format: "txt"), class: "btn btn-sm btn-outline-success", title: "テキスト形式でダウンロード" %>
+              <% else %>
+                <span class="btn btn-sm btn-outline-secondary disabled" title="完了した画像がありません">DL</span>
               <% end %>
               <%= link_to "削除", image_group_path(group), class: "btn btn-sm btn-outline-danger", data: { turbo_method: :delete, turbo_confirm: "グループ内の全ての画像も削除されます。本当に削除しますか？" } %>
             </td>
