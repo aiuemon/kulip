@@ -7,8 +7,8 @@ Rails.application.routes.draw do
   # 初回セットアップ
   resource :setup, only: %i[new create], controller: "setup"
 
-  # ダッシュボード（ルート）
-  root "dashboard#index"
+  # トップページ（アップロード一覧）
+  root "image_groups#index"
 
   # 画像グループ
   resources :image_groups, only: %i[index show new create destroy] do

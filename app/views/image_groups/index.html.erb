@@ -54,6 +54,6 @@
   </nav>
 <% else %>
   <div class="alert alert-info">
-    アップロードされた画像がありません。
+    <%= link_to "新規アップロード", new_image_group_path %>で画像をアップロードしてください。
   </div>
 <% end %>
