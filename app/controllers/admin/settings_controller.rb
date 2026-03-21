@@ -4,6 +4,7 @@ module Admin
       @auth_form = Forms::AuthSettingsForm.new
       @ocr_form = Forms::OcrSettingsForm.new
       @quota_form = Forms::QuotaSettingsForm.new
+      @retention_form = Forms::RetentionSettingsForm.new
     end
 
     def update_auth
@@ -39,12 +40,24 @@ module Admin
       end
     end
 
+    def update_retention
+      @retention_form = Forms::RetentionSettingsForm.new(retention_settings_params)
+
+      if @retention_form.save
+        redirect_to admin_settings_path(anchor: "retention"), notice: "保持設定を更新しました。"
+      else
+        load_other_forms
+        render :show, status: :unprocessable_entity
+      end
+    end
+
     private
 
     def load_other_forms
       @auth_form ||= Forms::AuthSettingsForm.new
       @ocr_form ||= Forms::OcrSettingsForm.new
       @quota_form ||= Forms::QuotaSettingsForm.new
+      @retention_form ||= Forms::RetentionSettingsForm.new
     end
 
     def auth_settings_params
@@ -57,6 +70,10 @@ module Admin
 
     def quota_settings_params
       params.require(:quota_settings).permit(:max_storage_per_user_mb)
+    end
+
+    def retention_settings_params
+      params.require(:retention_settings).permit(:auto_purge_enabled, :auto_purge_days)
     end
   end
 end

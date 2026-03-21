@@ -151,3 +151,52 @@
     <% end %>
   </div>
 </div>
+
+<%# 保持設定 %>
+<div class="card mb-4" id="retention">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span>ファイル保持設定</span>
+    <% if Setting.auto_purge_enabled? %>
+      <span class="badge bg-success">自動削除 有効</span>
+    <% else %>
+      <span class="badge bg-secondary">自動削除 無効</span>
+    <% end %>
+  </div>
+  <div class="card-body">
+    <%= form_with model: @retention_form, url: update_retention_admin_settings_path, method: :patch do |f| %>
+      <% if @retention_form.errors.any? %>
+        <div class="alert alert-danger">
+          <ul class="mb-0">
+            <% @retention_form.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="alert alert-info">
+        <strong>自動削除について:</strong><br>
+        有効にすると、アップロードから指定日数が経過したファイルは自動的に削除されます。
+        データベースのレコードは保持され、統計情報は引き続き表示されます。
+      </div>
+
+      <div class="form-check mb-3">
+        <%= f.check_box :auto_purge_enabled, class: "form-check-input" %>
+        <%= f.label :auto_purge_enabled, "自動削除を有効にする", class: "form-check-label" %>
+      </div>
+
+      <div class="mb-3">
+        <%= f.label :auto_purge_days, "保持日数", class: "form-label" %>
+        <%= f.number_field :auto_purge_days, class: "form-control", min: 1, style: "max-width: 200px;" %>
+        <div class="form-text">
+          アップロードから何日経過したファイルを削除するかを指定します。<br>
+          現在の設定: <strong><%= Setting.effective_auto_purge_days %> 日</strong>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <%= f.submit "保存", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

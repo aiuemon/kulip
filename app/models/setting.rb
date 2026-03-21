@@ -15,6 +15,7 @@ class Setting < RailsSettings::Base
   }.freeze
 
   DEFAULT_MAX_STORAGE_MB = 1024
+  DEFAULT_AUTO_PURGE_DAYS = 7
 
   # === 認証設定 ===
   field :local_auth_enabled, type: :boolean, default: true
@@ -31,6 +32,10 @@ class Setting < RailsSettings::Base
 
   # === クォータ設定 ===
   field :max_storage_per_user_mb, type: :integer, default: 1024
+
+  # === 保持設定 ===
+  field :auto_purge_enabled, type: :boolean, default: false
+  field :auto_purge_days, type: :integer, default: 7
 
   # === 互換性メソッド ===
   class << self
@@ -73,6 +78,16 @@ class Setting < RailsSettings::Base
 
     def max_storage_bytes
       max_storage_mb.megabytes
+    end
+
+    # 保持設定
+    def auto_purge_enabled?
+      auto_purge_enabled
+    end
+
+    def effective_auto_purge_days
+      days = auto_purge_days
+      days.present? && days > 0 ? days : DEFAULT_AUTO_PURGE_DAYS
     end
   end
 end

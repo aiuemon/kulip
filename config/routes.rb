@@ -37,6 +37,7 @@ Rails.application.routes.draw do
       patch :update_auth, on: :member
       patch :update_ocr, on: :member
       patch :update_quota, on: :member
+      patch :update_retention, on: :member
     end
     resources :users, only: %i[index] do
       member do

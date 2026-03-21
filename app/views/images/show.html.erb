@@ -9,6 +9,14 @@
   </div>
 </div>
 
+<% if @image.purged? %>
+  <div class="alert alert-warning">
+    <strong>このファイルは削除済みです。</strong>
+    アップロードから <%= Setting.effective_auto_purge_days %> 日が経過したため、ファイルは自動削除されました。
+    削除日時: <%= l(@image.purged_at, format: :long) %>
+  </div>
+<% end %>
+
 <div class="row">
   <div class="col-md-6 mb-4">
     <div class="card">
@@ -17,41 +25,62 @@
         <dl class="row mb-0">
           <dt class="col-sm-4">ステータス</dt>
           <dd class="col-sm-8">
-            <% case @image.status %>
-            <% when "pending" %>
-              <span class="badge bg-secondary">待機中</span>
-            <% when "processing" %>
-              <span class="badge bg-primary">処理中</span>
-            <% when "completed" %>
-              <span class="badge bg-success">完了</span>
-            <% when "failed" %>
-              <span class="badge bg-danger">失敗</span>
+            <% if @image.purged? %>
+              <span class="badge bg-warning text-dark">削除済み</span>
+            <% else %>
+              <% case @image.status %>
+              <% when "pending" %>
+                <span class="badge bg-secondary">待機中</span>
+              <% when "processing" %>
+                <span class="badge bg-primary">処理中</span>
+              <% when "completed" %>
+                <span class="badge bg-success">完了</span>
+              <% when "failed" %>
+                <span class="badge bg-danger">失敗</span>
+              <% end %>
             <% end %>
           </dd>
 
           <dt class="col-sm-4">アップロード日時</dt>
           <dd class="col-sm-8"><%= l(@image.created_at, format: :long) %></dd>
+
+          <% if @image.purged? %>
+            <dt class="col-sm-4">削除日時</dt>
+            <dd class="col-sm-8"><%= l(@image.purged_at, format: :long) %></dd>
+          <% end %>
         </dl>
       </div>
       <div class="card-footer">
-        <% if @image.failed? || @image.pending? %>
-          <%= link_to "再試行", retry_image_path(@image), class: "btn btn-warning btn-sm", data: { turbo_method: :post } %>
+        <% unless @image.purged? %>
+          <% if @image.failed? || @image.pending? %>
+            <%= link_to "再試行", retry_image_path(@image), class: "btn btn-warning btn-sm", data: { turbo_method: :post } %>
+          <% end %>
         <% end %>
         <%= link_to "削除", image_path(@image), class: "btn btn-danger btn-sm", data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" } %>
       </div>
     </div>
   </div>
 
-  <% if @image.file.attached? && @image.file.content_type.start_with?("image/") %>
-    <div class="col-md-6 mb-4">
-      <div class="card">
-        <div class="card-header">プレビュー</div>
-        <div class="card-body text-center">
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-header">プレビュー</div>
+      <div class="card-body text-center">
+        <% if @image.purged? %>
+          <div class="text-muted py-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-file-earmark-x mb-3" viewBox="0 0 16 16">
+              <path d="M6.854 7.146a.5.5 0 1 0-.708.708L7.293 9l-1.147 1.146a.5.5 0 0 0 .708.708L8 9.707l1.146 1.147a.5.5 0 0 0 .708-.708L8.707 9l1.147-1.146a.5.5 0 0 0-.708-.708L8 8.293z"/>
+              <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+            </svg>
+            <p>ファイルは削除されました</p>
+          </div>
+        <% elsif @image.file.attached? && @image.file.content_type.start_with?("image/") %>
           <%= image_tag @image.file, class: "img-fluid", style: "max-height: 400px;" %>
-        </div>
+        <% else %>
+          <span class="text-muted">プレビューなし</span>
+        <% end %>
       </div>
     </div>
-  <% end %>
+  </div>
 </div>
 
 <% if @image.ocr_result.present? %>
@@ -65,6 +94,13 @@
     </div>
     <div class="card-body">
       <pre class="mb-0" style="white-space: pre-wrap; word-wrap: break-word;"><%= @image.ocr_result %></pre>
+    </div>
+  </div>
+<% elsif @image.purged? %>
+  <div class="card mb-4">
+    <div class="card-header">OCR 結果</div>
+    <div class="card-body text-muted">
+      ファイルが削除されたため、OCR 結果は利用できません。
     </div>
   </div>
 <% end %>

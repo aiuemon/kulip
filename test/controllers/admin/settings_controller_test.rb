@@ -33,6 +33,7 @@ module Admin
       assert_select "#auth"
       assert_select "#ocr"
       assert_select "#quota"
+      assert_select "#retention"
     end
 
     # Auth settings tests
@@ -92,6 +93,52 @@ module Admin
 
       assert_redirected_to admin_settings_path(anchor: "quota")
       assert_equal 500, Setting.max_storage_per_user_mb
+    end
+
+    # Retention settings tests
+    test "update_retention enables auto purge" do
+      sign_in @admin
+      Setting.auto_purge_enabled = false
+
+      patch update_retention_admin_settings_path, params: {
+        retention_settings: { auto_purge_enabled: true, auto_purge_days: 14 }
+      }
+
+      assert_redirected_to admin_settings_path(anchor: "retention")
+      assert Setting.auto_purge_enabled?
+      assert_equal 14, Setting.auto_purge_days
+    end
+
+    test "update_retention disables auto purge" do
+      sign_in @admin
+      Setting.auto_purge_enabled = true
+
+      patch update_retention_admin_settings_path, params: {
+        retention_settings: { auto_purge_enabled: false }
+      }
+
+      assert_redirected_to admin_settings_path(anchor: "retention")
+      assert_not Setting.auto_purge_enabled?
+    end
+
+    test "update_retention validates auto_purge_days" do
+      sign_in @admin
+
+      patch update_retention_admin_settings_path, params: {
+        retention_settings: { auto_purge_enabled: true, auto_purge_days: 0 }
+      }
+
+      assert_response :unprocessable_entity
+    end
+
+    test "update_retention requires admin" do
+      sign_in @user
+
+      patch update_retention_admin_settings_path, params: {
+        retention_settings: { auto_purge_enabled: true }
+      }
+
+      assert_redirected_to root_path
     end
   end
 end

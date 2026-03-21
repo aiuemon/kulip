@@ -71,4 +71,68 @@ class ImageTest < ActiveSupport::TestCase
     assert_not image.valid?
     assert_includes image.errors[:status], "is not included in the list"
   end
+
+  # Purge-related tests
+  test "purged? returns true when purged_at is present" do
+    image = images(:purged_image)
+    assert image.purged?
+  end
+
+  test "purged? returns false when purged_at is nil" do
+    image = images(:completed_image)
+    assert_not image.purged?
+  end
+
+  test "not_purged scope excludes purged images" do
+    not_purged_images = Image.not_purged
+    not_purged_images.each do |image|
+      assert_nil image.purged_at
+    end
+  end
+
+  test "purged scope includes only purged images" do
+    purged_images = Image.purged
+    purged_images.each do |image|
+      assert_not_nil image.purged_at
+    end
+  end
+
+  test "purgeable scope finds old completed images without purged_at" do
+    Setting.auto_purge_days = 7
+
+    purgeable_images = Image.purgeable
+    purgeable_images.each do |image|
+      assert_equal "completed", image.status
+      assert_nil image.purged_at
+      assert image.created_at < 7.days.ago
+    end
+  end
+
+  test "purgeable scope excludes already purged images" do
+    Setting.auto_purge_days = 7
+
+    purgeable_images = Image.purgeable
+    assert_not_includes purgeable_images, images(:purged_image)
+  end
+
+  test "purge_file! sets purged_at and clears ocr_result" do
+    image = images(:old_completed_image)
+    assert_not image.purged?
+    assert_not_nil image.ocr_result
+
+    image.purge_file!
+
+    assert image.purged?
+    assert_not_nil image.purged_at
+    assert_nil image.ocr_result
+  end
+
+  test "purge_file! does nothing if already purged" do
+    image = images(:purged_image)
+    original_purged_at = image.purged_at
+
+    image.purge_file!
+
+    assert_equal original_purged_at, image.purged_at
+  end
 end

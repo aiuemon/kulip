@@ -44,9 +44,16 @@
       </thead>
       <tbody>
         <% @images.each do |image| %>
-          <tr>
+          <tr class="<%= 'table-warning' if image.purged? %>">
             <td>
-              <% if image.file.attached? && image.file.content_type.start_with?("image/") %>
+              <% if image.purged? %>
+                <div class="d-flex align-items-center justify-content-center text-muted" style="width: 100px; height: 60px; background: #f8f9fa; border-radius: 4px;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M6.854 7.146a.5.5 0 1 0-.708.708L7.293 9l-1.147 1.146a.5.5 0 0 0 .708.708L8 9.707l1.146 1.147a.5.5 0 0 0 .708-.708L8.707 9l1.147-1.146a.5.5 0 0 0-.708-.708L8 8.293z"/>
+                    <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+                  </svg>
+                </div>
+              <% elsif image.file.attached? && image.file.content_type.start_with?("image/") %>
                 <%= image_tag image.file.variant(resize_to_limit: [100, 100]), class: "img-thumbnail" %>
               <% else %>
                 <span class="text-muted">-</span>
@@ -54,24 +61,30 @@
             </td>
             <td><%= image.name %></td>
             <td>
-              <% case image.status %>
-              <% when "pending" %>
-                <span class="badge bg-secondary">待機中</span>
-              <% when "processing" %>
-                <span class="badge bg-primary">処理中</span>
-              <% when "completed" %>
-                <span class="badge bg-success">完了</span>
-              <% when "failed" %>
-                <span class="badge bg-danger">失敗</span>
+              <% if image.purged? %>
+                <span class="badge bg-warning text-dark">削除済み</span>
+              <% else %>
+                <% case image.status %>
+                <% when "pending" %>
+                  <span class="badge bg-secondary">待機中</span>
+                <% when "processing" %>
+                  <span class="badge bg-primary">処理中</span>
+                <% when "completed" %>
+                  <span class="badge bg-success">完了</span>
+                <% when "failed" %>
+                  <span class="badge bg-danger">失敗</span>
+                <% end %>
               <% end %>
             </td>
             <td>
               <%= link_to "詳細", image_path(image), class: "btn btn-sm btn-outline-primary" %>
-              <% if image.completed? && image.ocr_result.present? %>
-                <%= link_to "DL", download_image_path(image, format: "txt"), class: "btn btn-sm btn-outline-success", title: "ダウンロード" %>
-              <% end %>
-              <% if image.failed? || image.pending? %>
-                <%= link_to "再実行", retry_image_path(image), class: "btn btn-sm btn-outline-warning", data: { turbo_method: :post } %>
+              <% unless image.purged? %>
+                <% if image.completed? && image.ocr_result.present? %>
+                  <%= link_to "DL", download_image_path(image, format: "txt"), class: "btn btn-sm btn-outline-success", title: "ダウンロード" %>
+                <% end %>
+                <% if image.failed? || image.pending? %>
+                  <%= link_to "再実行", retry_image_path(image), class: "btn btn-sm btn-outline-warning", data: { turbo_method: :post } %>
+                <% end %>
               <% end %>
             </td>
           </tr>

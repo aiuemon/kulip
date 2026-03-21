@@ -7,12 +7,20 @@ class Image < ApplicationRecord
 
   validates :name, presence: true
   validates :status, presence: true, inclusion: { in: STATUSES }
-  validates :file, presence: true
+  validates :file, presence: true, unless: :purged?
 
   after_create_commit :enqueue_ocr_processing
 
   scope :by_status, ->(status) { where(status: status) }
   scope :recent, -> { order(created_at: :desc) }
+  scope :not_purged, -> { where(purged_at: nil) }
+  scope :purged, -> { where.not(purged_at: nil) }
+  scope :purgeable, lambda {
+    days = Setting.effective_auto_purge_days
+    where(status: "completed")
+      .where(purged_at: nil)
+      .where("created_at < ?", days.days.ago)
+  }
 
   def pending?
     status == "pending"
@@ -28,6 +36,20 @@ class Image < ApplicationRecord
 
   def failed?
     status == "failed"
+  end
+
+  def purged?
+    purged_at.present?
+  end
+
+  # ファイルを削除（論理削除）
+  def purge_file!
+    return if purged?
+
+    transaction do
+      file.purge if file.attached?
+      update!(purged_at: Time.current, ocr_result: nil)
+    end
   end
 
   # OCR 処理を再実行

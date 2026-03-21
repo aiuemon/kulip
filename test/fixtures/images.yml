@@ -35,3 +35,24 @@ processing_image:
   ocr_result:
   ocr_duration:
   ocr_completed_at:
+
+purged_image:
+  user: user
+  image_group: group_with_images
+  name: purged_image.png
+  status: completed
+  ocr_result:
+  ocr_duration: 3
+  ocr_completed_at: <%= 10.days.ago %>
+  purged_at: <%= 3.days.ago %>
+  created_at: <%= 10.days.ago %>
+
+old_completed_image:
+  user: user
+  image_group: group_with_images
+  name: old_image.png
+  status: completed
+  ocr_result: "古い画像の結果"
+  ocr_duration: 2
+  ocr_completed_at: <%= 10.days.ago %>
+  created_at: <%= 10.days.ago %>

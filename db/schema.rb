@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_21_004010) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_21_112804) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -76,10 +76,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_21_004010) do
     t.datetime "ocr_completed_at"
     t.integer "ocr_duration"
     t.text "ocr_result"
+    t.datetime "purged_at"
     t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["image_group_id"], name: "index_images_on_image_group_id"
+    t.index ["purged_at"], name: "index_images_on_purged_at"
     t.index ["status"], name: "index_images_on_status"
     t.index ["user_id"], name: "index_images_on_user_id"
   end
