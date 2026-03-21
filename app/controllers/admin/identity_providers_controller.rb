@@ -45,6 +45,22 @@ module Admin
         notice: "IdP を削除しました。設定を反映するにはアプリを再起動してください。"
     end
 
+    def parse_saml_metadata
+      result = if params[:metadata_file].present?
+        SamlMetadataParser.parse_xml(params[:metadata_file].read)
+      elsif params[:metadata_url].present?
+        SamlMetadataParser.fetch_and_parse(params[:metadata_url])
+      else
+        SamlMetadataParser::Result.new(success?: false, error: "メタデータファイルまたは URL を指定してください")
+      end
+
+      if result.success?
+        render json: { success: true, data: result.data }
+      else
+        render json: { success: false, error: result.error }, status: :unprocessable_entity
+      end
+    end
+
     def restart_app
       if Rails.env.development?
         # tmp/restart.txt をタッチして再起動をトリガー
