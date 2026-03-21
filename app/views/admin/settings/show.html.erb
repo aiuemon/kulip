@@ -174,12 +174,6 @@
         </div>
       <% end %>
 
-      <div class="alert alert-info">
-        <strong>自動削除について:</strong><br>
-        有効にすると、アップロードから指定日数が経過したファイルは自動的に削除されます。
-        データベースのレコードは保持され、統計情報は引き続き表示されます。
-      </div>
-
       <div class="form-check mb-3">
         <%= f.check_box :auto_purge_enabled, class: "form-check-input" %>
         <%= f.label :auto_purge_enabled, "自動削除を有効にする", class: "form-check-label" %>
