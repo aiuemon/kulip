@@ -38,6 +38,47 @@
   <h6 class="text-muted mb-3"><%= @identity_provider.provider_type&.upcase %> 設定</h6>
 
   <% if @identity_provider.provider_type == "saml" %>
+    <% if @identity_provider.new_record? %>
+      <div class="card bg-light mb-4" data-controller="saml-metadata">
+        <div class="card-body">
+          <h6 class="card-title">IdP メタデータから自動入力</h6>
+          <p class="card-text small text-muted">IdP のメタデータ XML をアップロードするか、URL を指定して設定を自動入力できます。</p>
+
+          <ul class="nav nav-tabs mb-3" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="metadata-file-tab" data-bs-toggle="tab" data-bs-target="#metadata-file" type="button" role="tab">ファイル</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="metadata-url-tab" data-bs-toggle="tab" data-bs-target="#metadata-url" type="button" role="tab">URL</button>
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="metadata-file" role="tabpanel">
+              <div class="input-group">
+                <input type="file" class="form-control" id="metadata_file" accept=".xml,application/xml,text/xml" data-saml-metadata-target="file" data-action="change->saml-metadata#fileSelected">
+                <button type="button" class="btn btn-outline-primary" data-action="click->saml-metadata#uploadFile" data-saml-metadata-target="fileButton" disabled>
+                  読み込む
+                </button>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="metadata-url" role="tabpanel">
+              <div class="input-group">
+                <input type="url" class="form-control" id="metadata_url" placeholder="https://idp.example.com/metadata" data-saml-metadata-target="url">
+                <button type="button" class="btn btn-outline-primary" data-action="click->saml-metadata#fetchUrl">
+                  取得
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-2 d-none" data-saml-metadata-target="status">
+            <div class="alert alert-info mb-0 py-2" data-saml-metadata-target="statusMessage"></div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
     <div class="mb-3">
       <%= label_tag "settings_idp_sso_url", "IdP SSO URL", class: "form-label" %>
       <%= text_field_tag "identity_provider[settings][idp_sso_url]",

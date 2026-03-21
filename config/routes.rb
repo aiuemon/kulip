@@ -31,6 +31,7 @@ Rails.application.routes.draw do
     resources :identity_providers do
       collection do
         post :restart_app
+        post :parse_saml_metadata
       end
     end
     resource :settings, only: [ :show ] do
