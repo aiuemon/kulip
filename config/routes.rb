@@ -34,6 +34,7 @@ Rails.application.routes.draw do
     end
     resource :auth_settings, only: %i[show update]
     resource :ocr_settings, only: %i[show update]
+    resource :general_settings, only: %i[show update]
     resources :users, only: %i[index] do
       member do
         patch :toggle_admin

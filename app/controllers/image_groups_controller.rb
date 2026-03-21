@@ -32,6 +32,14 @@ class ImageGroupsController < ApplicationController
       return
     end
 
+    # クォータチェック
+    total_size = uploaded_files.sum { |f| f.size }
+    if current_user.quota_exceeded?(total_size)
+      available_mb = current_user.available_storage_mb.round(1)
+      redirect_to new_image_group_path, alert: "容量制限を超えています。残り容量: #{available_mb} MB"
+      return
+    end
+
     @image_group = current_user.image_groups.build(memo: params[:memo].presence)
 
     if @image_group.save

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_18_143525) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_20_235754) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -92,6 +92,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_143525) do
     t.json "options", default: {}
     t.text "prompt", default: ""
     t.integer "timeout", default: 300
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "quota_settings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "max_storage_per_user_mb", default: 1024
     t.datetime "updated_at", null: false
   end
 

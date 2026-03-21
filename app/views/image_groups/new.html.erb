@@ -3,6 +3,15 @@
   <%= link_to "一覧に戻る", image_groups_path, class: "btn btn-outline-secondary" %>
 </div>
 
+<div class="alert alert-info mb-4">
+  <strong>ストレージ使用状況:</strong>
+  <%= number_with_precision(current_user.storage_usage_mb, precision: 1) %> MB /
+  <%= number_with_delimiter(QuotaSetting.max_storage_mb) %> MB
+  <span class="text-muted">
+    （残り: <%= number_with_precision(current_user.available_storage_mb, precision: 1) %> MB）
+  </span>
+</div>
+
 <div class="card">
   <div class="card-body dropzone" data-controller="dropzone">
     <%= form_with url: image_groups_path, method: :post, multipart: true do |f| %>

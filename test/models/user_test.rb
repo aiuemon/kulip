@@ -48,4 +48,36 @@ class UserTest < ActiveSupport::TestCase
       assert_equal existing_user.id, user.id
     end
   end
+
+  test "storage_usage_bytes returns total size of uploaded images" do
+    user = users(:user)
+    assert_respond_to user, :storage_usage_bytes
+    assert_kind_of Numeric, user.storage_usage_bytes
+  end
+
+  test "storage_usage_mb returns usage in megabytes" do
+    user = users(:user)
+    assert_respond_to user, :storage_usage_mb
+    assert_kind_of Numeric, user.storage_usage_mb
+  end
+
+  test "quota_exceeded? returns false when under limit" do
+    user = users(:user)
+    QuotaSetting.instance.update!(max_storage_per_user_mb: 1024)
+    assert_not user.quota_exceeded?
+  end
+
+  test "available_storage_bytes returns remaining capacity" do
+    user = users(:user)
+    QuotaSetting.instance.update!(max_storage_per_user_mb: 1024)
+    assert_kind_of Numeric, user.available_storage_bytes
+    assert user.available_storage_bytes >= 0
+  end
+
+  test "available_storage_mb returns remaining capacity in mb" do
+    user = users(:user)
+    QuotaSetting.instance.update!(max_storage_per_user_mb: 1024)
+    assert_kind_of Numeric, user.available_storage_mb
+    assert user.available_storage_mb >= 0
+  end
 end
