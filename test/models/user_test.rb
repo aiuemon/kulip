@@ -63,20 +63,20 @@ class UserTest < ActiveSupport::TestCase
 
   test "quota_exceeded? returns false when under limit" do
     user = users(:user)
-    QuotaSetting.instance.update!(max_storage_per_user_mb: 1024)
+    Setting.max_storage_per_user_mb = 1024
     assert_not user.quota_exceeded?
   end
 
   test "available_storage_bytes returns remaining capacity" do
     user = users(:user)
-    QuotaSetting.instance.update!(max_storage_per_user_mb: 1024)
+    Setting.max_storage_per_user_mb = 1024
     assert_kind_of Numeric, user.available_storage_bytes
     assert user.available_storage_bytes >= 0
   end
 
   test "available_storage_mb returns remaining capacity in mb" do
     user = users(:user)
-    QuotaSetting.instance.update!(max_storage_per_user_mb: 1024)
+    Setting.max_storage_per_user_mb = 1024
     assert_kind_of Numeric, user.available_storage_mb
     assert user.available_storage_mb >= 0
   end

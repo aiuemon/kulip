@@ -1,0 +1,153 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>設定</h1>
+</div>
+
+<%# 認証設定 %>
+<div class="card mb-4" id="auth">
+  <div class="card-header">
+    認証設定
+  </div>
+  <div class="card-body">
+    <%= form_with model: @auth_form, url: update_auth_admin_settings_path, method: :patch do |f| %>
+      <% if @auth_form.errors.any? %>
+        <div class="alert alert-danger">
+          <ul class="mb-0">
+            <% @auth_form.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <h6 class="text-muted mb-3">ローカル認証</h6>
+      <div class="form-check mb-2">
+        <%= f.check_box :local_auth_enabled, class: "form-check-input" %>
+        <%= f.label :local_auth_enabled, "ローカル認証を有効にする", class: "form-check-label" %>
+      </div>
+
+      <div class="form-check mb-2">
+        <%= f.check_box :local_auth_show_on_login, class: "form-check-input" %>
+        <%= f.label :local_auth_show_on_login, "ログイン画面にローカル認証フォームを表示", class: "form-check-label" %>
+      </div>
+
+      <div class="form-check mb-4">
+        <%= f.check_box :self_signup_enabled, class: "form-check-input" %>
+        <%= f.label :self_signup_enabled, "新規登録を許可する", class: "form-check-label" %>
+      </div>
+
+      <h6 class="text-muted mb-3">外部 IdP</h6>
+      <p class="card-text mb-3">
+        登録済み IdP: <span class="badge bg-secondary"><%= IdentityProvider.count %> 件</span>
+        （有効: <span class="badge bg-success"><%= IdentityProvider.enabled.count %> 件</span>）
+      </p>
+      <%= link_to "IdP 設定を管理", admin_identity_providers_path, class: "btn btn-outline-primary btn-sm mb-3" %>
+
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <%= f.submit "保存", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<%# OCR設定 %>
+<div class="card mb-4" id="ocr">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span>OCR 設定</span>
+    <% if Setting.ocr_configured? %>
+      <span class="badge bg-success">有効</span>
+    <% else %>
+      <span class="badge bg-danger">無効</span>
+    <% end %>
+  </div>
+  <div class="card-body">
+    <%= form_with model: @ocr_form, url: update_ocr_admin_settings_path, method: :patch do |f| %>
+      <% if @ocr_form.errors.any? %>
+        <div class="alert alert-danger">
+          <ul class="mb-0">
+            <% @ocr_form.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <h6 class="text-muted mb-3">API 接続設定</h6>
+      <div class="mb-3">
+        <%= f.label :endpoint, "API エンドポイント", class: "form-label" %>
+        <%= f.text_field :endpoint, class: "form-control", placeholder: "例: http://localhost:11434/api/generate" %>
+        <div class="form-text">OCR API の URL</div>
+      </div>
+
+      <div class="mb-3">
+        <%= f.label :api_key, "API キー", class: "form-label" %>
+        <%= f.text_field :api_key, class: "form-control", placeholder: "（任意）" %>
+        <div class="form-text">API 認証が必要な場合に設定（Bearer トークンとして送信）</div>
+      </div>
+
+      <div class="mb-3">
+        <%= f.label :timeout, "タイムアウト（秒）", class: "form-label" %>
+        <%= f.number_field :timeout, class: "form-control", min: 1, max: 3600, placeholder: Setting::DEFAULT_OCR_TIMEOUT, style: "max-width: 200px;" %>
+        <div class="form-text">API リクエストのタイムアウト時間（デフォルト: <%= Setting::DEFAULT_OCR_TIMEOUT %> 秒）</div>
+      </div>
+
+      <h6 class="text-muted mt-4 mb-3">モデル設定</h6>
+      <div class="mb-3">
+        <%= f.label :model, "モデル名", class: "form-label" %>
+        <%= f.text_field :model, class: "form-control", placeholder: "例: llava:latest" %>
+        <div class="form-text">OCR に使用する VLM モデル名</div>
+      </div>
+
+      <h6 class="text-muted mt-4 mb-3">プロンプト設定</h6>
+      <div class="mb-3">
+        <%= f.label :prompt, "プロンプト", class: "form-label" %>
+        <%= f.text_area :prompt, class: "form-control", rows: 6, placeholder: Setting::DEFAULT_OCR_PROMPT %>
+        <div class="form-text">空欄の場合はデフォルトのプロンプトが使用されます</div>
+      </div>
+
+      <h6 class="text-muted mt-4 mb-3">オプション設定</h6>
+      <div class="mb-3">
+        <%= f.label :options, "options (JSON)", class: "form-label" %>
+        <%= f.text_area :options, class: "form-control font-monospace", rows: 6, value: @ocr_form.options_for_display %>
+        <div class="form-text">temperature, num_predict, num_ctx などの設定を JSON 形式で指定</div>
+      </div>
+
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <%= f.submit "保存", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<%# クォータ設定 %>
+<div class="card mb-4" id="quota">
+  <div class="card-header">
+    クォータ（容量制限）
+  </div>
+  <div class="card-body">
+    <%= form_with model: @quota_form, url: update_quota_admin_settings_path, method: :patch do |f| %>
+      <% if @quota_form.errors.any? %>
+        <div class="alert alert-danger">
+          <ul class="mb-0">
+            <% @quota_form.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="mb-3">
+        <%= f.label :max_storage_per_user_mb, "ユーザーあたりの最大ストレージ容量（MB）", class: "form-label" %>
+        <%= f.number_field :max_storage_per_user_mb, class: "form-control", min: 1, style: "max-width: 200px;" %>
+        <div class="form-text">
+          1ユーザーがアップロードできるファイルの合計容量の上限を設定します。<br>
+          現在の設定: <strong><%= number_with_delimiter(Setting.max_storage_mb) %> MB</strong>
+          （<%= number_with_precision(Setting.max_storage_mb / 1024.0, precision: 2) %> GB）
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <%= f.submit "保存", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

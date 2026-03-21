@@ -10,9 +10,9 @@ class OcrApiClient
   class TimeoutError < Error; end
 
   def initialize
-    @endpoint = OcrSetting.ocr_endpoint
-    @api_key = OcrSetting.ocr_api_key
-    @timeout = OcrSetting.ocr_timeout
+    @endpoint = Setting.ocr_endpoint
+    @api_key = Setting.ocr_api_key
+    @timeout = Setting.effective_ocr_timeout
 
     raise ConfigurationError, "OCR API endpoint is not configured" if @endpoint.blank?
   end
@@ -34,7 +34,7 @@ class OcrApiClient
 
   # API の設定が有効かどうかを確認
   def self.configured?
-    OcrSetting.configured?
+    Setting.ocr_configured?
   end
 
   private
@@ -51,11 +51,11 @@ class OcrApiClient
     image_b64 = Base64.strict_encode64(image_data)
 
     payload = {
-      model: OcrSetting.ocr_model,
-      prompt: OcrSetting.ocr_prompt,
+      model: Setting.ocr_model,
+      prompt: Setting.effective_ocr_prompt,
       images: [ image_b64 ],
       stream: true,
-      options: OcrSetting.ocr_options
+      options: Setting.effective_ocr_options
     }
 
     request = Net::HTTP::Post.new(uri.request_uri)

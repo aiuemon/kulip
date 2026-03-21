@@ -5,7 +5,7 @@
         <h2 class="mb-0">ログイン</h2>
       </div>
       <div class="card-body">
-        <% if AuthSetting.local_auth_enabled? && AuthSetting.local_auth_show_on_login? %>
+        <% if Setting.local_auth_enabled? && Setting.local_auth_show_on_login? %>
           <h5 class="card-title">メールアドレスでログイン</h5>
           <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
             <div class="mb-3">
@@ -33,7 +33,7 @@
 
         <% visible_idps = IdentityProvider.enabled.visible_on_login %>
         <% if visible_idps.any? %>
-          <% if AuthSetting.local_auth_enabled? && AuthSetting.local_auth_show_on_login? %>
+          <% if Setting.local_auth_enabled? && Setting.local_auth_show_on_login? %>
             <hr>
           <% end %>
           <h5 class="card-title">外部サービスでログイン</h5>
@@ -54,13 +54,13 @@
           </div>
         <% end %>
 
-        <% unless AuthSetting.local_auth_show_on_login? || visible_idps.any? %>
+        <% unless Setting.local_auth_show_on_login? || visible_idps.any? %>
           <div class="alert alert-warning">
             利用可能なログイン方法がありません。管理者に連絡してください。
           </div>
         <% end %>
       </div>
-      <% if AuthSetting.self_signup_enabled? %>
+      <% if Setting.self_signup_enabled? %>
         <div class="card-footer text-center">
           <%= link_to "アカウントをお持ちでない方はこちら", new_user_registration_path %>
         </div>

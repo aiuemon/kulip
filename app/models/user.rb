@@ -27,12 +27,12 @@ class User < ApplicationRecord
 
   # クォータ超過チェック
   def quota_exceeded?(additional_bytes = 0)
-    (storage_usage_bytes + additional_bytes) > QuotaSetting.max_storage_bytes
+    (storage_usage_bytes + additional_bytes) > Setting.max_storage_bytes
   end
 
   # 残り容量（バイト）
   def available_storage_bytes
-    [ QuotaSetting.max_storage_bytes - storage_usage_bytes, 0 ].max
+    [ Setting.max_storage_bytes - storage_usage_bytes, 0 ].max
   end
 
   # 残り容量（MB）

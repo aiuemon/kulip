@@ -32,9 +32,11 @@ Rails.application.routes.draw do
         post :restart_app
       end
     end
-    resource :auth_settings, only: %i[show update]
-    resource :ocr_settings, only: %i[show update]
-    resource :general_settings, only: %i[show update]
+    resource :settings, only: [ :show ] do
+      patch :update_auth, on: :member
+      patch :update_ocr, on: :member
+      patch :update_quota, on: :member
+    end
     resources :users, only: %i[index] do
       member do
         patch :toggle_admin
