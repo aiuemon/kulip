@@ -27,6 +27,7 @@ Rails.application.routes.draw do
 
   # 管理者画面
   namespace :admin do
+    resource :statistics, only: [ :show ]
     resources :identity_providers do
       collection do
         post :restart_app

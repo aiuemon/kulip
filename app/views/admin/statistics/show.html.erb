@@ -1,0 +1,87 @@
+<% content_for :head do %>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<% end %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>統計情報</h1>
+  <span class="text-muted">過去30日間</span>
+</div>
+
+<%# サマリーカード %>
+<div class="row mb-4">
+  <div class="col-md-4">
+    <div class="card text-center">
+      <div class="card-body">
+        <h5 class="card-title text-muted">期間中の利用者数</h5>
+        <p class="display-6"><%= @daily_users.values.sum %> 人</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-center">
+      <div class="card-body">
+        <h5 class="card-title text-muted">期間中のアップロード数</h5>
+        <p class="display-6"><%= @daily_images.values.sum %> 枚</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-center">
+      <div class="card-body">
+        <h5 class="card-title text-muted">期間中の処理時間合計</h5>
+        <p class="display-6"><%= format_duration_short(@daily_ocr_duration.values.sum) %></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%# 日ごとの利用者数 %>
+<div class="card mb-4">
+  <div class="card-header">日ごとの利用者数</div>
+  <div class="card-body">
+    <div style="height: 250px;">
+      <canvas
+        data-controller="chart"
+        data-chart-type-value="line"
+        data-chart-labels-value="<%= chart_labels(@date_range).to_json %>"
+        data-chart-data-value="<%= chart_data(@daily_users, @date_range).to_json %>"
+        data-chart-label-value="利用者数"
+        data-chart-color-value="rgb(54, 162, 235)">
+      </canvas>
+    </div>
+  </div>
+</div>
+
+<%# 日ごとのアップロード画像数 %>
+<div class="card mb-4">
+  <div class="card-header">日ごとのアップロード画像数</div>
+  <div class="card-body">
+    <div style="height: 250px;">
+      <canvas
+        data-controller="chart"
+        data-chart-type-value="bar"
+        data-chart-labels-value="<%= chart_labels(@date_range).to_json %>"
+        data-chart-data-value="<%= chart_data(@daily_images, @date_range).to_json %>"
+        data-chart-label-value="画像数"
+        data-chart-color-value="rgb(75, 192, 192)">
+      </canvas>
+    </div>
+  </div>
+</div>
+
+<%# 日ごとのOCR処理時間 %>
+<div class="card mb-4">
+  <div class="card-header">日ごとの OCR 処理時間（秒）</div>
+  <div class="card-body">
+    <div style="height: 250px;">
+      <canvas
+        data-controller="chart"
+        data-chart-type-value="bar"
+        data-chart-labels-value="<%= chart_labels(@date_range).to_json %>"
+        data-chart-data-value="<%= chart_data(@daily_ocr_duration, @date_range).to_json %>"
+        data-chart-label-value="処理時間（秒）"
+        data-chart-color-value="rgb(255, 159, 64)">
+      </canvas>
+    </div>
+  </div>
+</div>
