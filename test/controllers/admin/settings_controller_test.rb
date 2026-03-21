@@ -34,6 +34,7 @@ module Admin
       assert_select "#ocr"
       assert_select "#quota"
       assert_select "#retention"
+      assert_select "#notification"
     end
 
     # Auth settings tests
@@ -136,6 +137,47 @@ module Admin
 
       patch update_retention_admin_settings_path, params: {
         retention_settings: { auto_purge_enabled: true }
+      }
+
+      assert_redirected_to root_path
+    end
+
+    # Notification settings tests
+    test "update_notification enables email notification" do
+      sign_in @admin
+      Setting.notification_email_enabled = false
+
+      patch update_notification_admin_settings_path, params: {
+        notification_settings: {
+          enabled: true,
+          subject: "テスト件名",
+          body: "テスト本文"
+        }
+      }
+
+      assert_redirected_to admin_settings_path(anchor: "notification")
+      assert Setting.notification_email_enabled?
+      assert_equal "テスト件名", Setting.notification_email_subject
+      assert_equal "テスト本文", Setting.notification_email_body
+    end
+
+    test "update_notification disables email notification" do
+      sign_in @admin
+      Setting.notification_email_enabled = true
+
+      patch update_notification_admin_settings_path, params: {
+        notification_settings: { enabled: false }
+      }
+
+      assert_redirected_to admin_settings_path(anchor: "notification")
+      assert_not Setting.notification_email_enabled?
+    end
+
+    test "update_notification requires admin" do
+      sign_in @user
+
+      patch update_notification_admin_settings_path, params: {
+        notification_settings: { enabled: true }
       }
 
       assert_redirected_to root_path

@@ -17,6 +17,22 @@ class Setting < RailsSettings::Base
   DEFAULT_MAX_STORAGE_MB = 1024
   DEFAULT_AUTO_PURGE_DAYS = 7
 
+  DEFAULT_NOTIFICATION_SUBJECT = "[kulip] 文字起こしが完了しました".freeze
+  DEFAULT_NOTIFICATION_BODY = <<~BODY.freeze
+    {{user_name}} 様
+
+    アップロードされた画像の文字起こし処理が完了しました。
+
+    ファイル名: {{image_name}}
+    処理時間: {{ocr_duration}} 秒
+
+    以下のリンクから結果を確認できます:
+    {{image_url}}
+
+    ---
+    このメールは kulip から自動送信されています。
+  BODY
+
   # === 認証設定 ===
   field :local_auth_enabled, type: :boolean, default: true
   field :local_auth_show_on_login, type: :boolean, default: true
@@ -36,6 +52,11 @@ class Setting < RailsSettings::Base
   # === 保持設定 ===
   field :auto_purge_enabled, type: :boolean, default: false
   field :auto_purge_days, type: :integer, default: 7
+
+  # === メール通知設定 ===
+  field :notification_email_enabled, type: :boolean, default: false
+  field :notification_email_subject, type: :string, default: ""
+  field :notification_email_body, type: :string, default: ""
 
   # === 互換性メソッド ===
   class << self
@@ -88,6 +109,19 @@ class Setting < RailsSettings::Base
     def effective_auto_purge_days
       days = auto_purge_days
       days.present? && days > 0 ? days : DEFAULT_AUTO_PURGE_DAYS
+    end
+
+    # メール通知設定
+    def notification_email_enabled?
+      notification_email_enabled
+    end
+
+    def effective_notification_subject
+      notification_email_subject.presence || DEFAULT_NOTIFICATION_SUBJECT
+    end
+
+    def effective_notification_body
+      notification_email_body.presence || DEFAULT_NOTIFICATION_BODY
     end
   end
 end

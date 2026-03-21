@@ -37,9 +37,19 @@ class OcrProcessJob < ApplicationJob
       ocr_completed_at: Time.current
     )
 
+    send_completion_notification(image)
+
   rescue OcrApiClient::Error => e
     Rails.logger.error "OCR processing failed for image #{image.id}: #{e.message}"
     image.update!(status: "failed", ocr_result: "Error: #{e.message}")
     raise
+  end
+
+  def send_completion_notification(image)
+    return unless Setting.notification_email_enabled?
+
+    OcrCompletionMailer.completion_notification(image).deliver_later
+  rescue StandardError => e
+    Rails.logger.error "Failed to send completion notification for image #{image.id}: #{e.message}"
   end
 end

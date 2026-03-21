@@ -194,3 +194,54 @@
     <% end %>
   </div>
 </div>
+
+<%# メール通知設定 %>
+<div class="card mb-4" id="notification">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span>メール通知設定</span>
+    <% if Setting.notification_email_enabled? %>
+      <span class="badge bg-success">有効</span>
+    <% else %>
+      <span class="badge bg-secondary">無効</span>
+    <% end %>
+  </div>
+  <div class="card-body">
+    <%= form_with model: @notification_form, url: update_notification_admin_settings_path, method: :patch do |f| %>
+      <% if @notification_form.errors.any? %>
+        <div class="alert alert-danger">
+          <ul class="mb-0">
+            <% @notification_form.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="form-check mb-3">
+        <%= f.check_box :enabled, class: "form-check-input" %>
+        <%= f.label :enabled, "OCR 処理完了時にメール通知を送信する", class: "form-check-label" %>
+      </div>
+
+      <div class="mb-3">
+        <%= f.label :subject, "件名", class: "form-label" %>
+        <%= f.text_field :subject, class: "form-control" %>
+      </div>
+
+      <div class="mb-3">
+        <%= f.label :body, "本文", class: "form-label" %>
+        <%= f.text_area :body, class: "form-control font-monospace", rows: 12 %>
+        <div class="form-text">
+          以下のプレースホルダーが使用できます:<br>
+          <code>{{user_name}}</code> - 利用者名<br>
+          <code>{{image_name}}</code> - ファイル名<br>
+          <code>{{ocr_duration}}</code> - 処理時間（秒）<br>
+          <code>{{image_url}}</code> - 結果ページの URL
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <%= f.submit "保存", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
