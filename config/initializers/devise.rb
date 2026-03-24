@@ -315,8 +315,8 @@ Devise.setup do |config|
         end
       end
     end
-  rescue ActiveRecord::NoDatabaseError, ActiveRecord::StatementInvalid
-    # マイグレーション前やテーブルが存在しない場合はスキップ
+  rescue ActiveRecord::NoDatabaseError, ActiveRecord::ConnectionNotEstablished, ActiveRecord::StatementInvalid
+    # マイグレーション前、DB接続不可、テーブルが存在しない場合はスキップ
   end
 
   # ==> Warden configuration
