@@ -1,0 +1,30 @@
+services:
+  app:
+    image: ghcr.io/aiuemon/kulip:0.1.0
+    ports:
+      - "3000:80"
+    environment:
+      DATABASE_URL: postgres://kulip:kulip@db:5432/kulip_production
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: kulip
+      POSTGRES_PASSWORD: kulip
+      POSTGRES_DB: kulip_production
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kulip -d kulip_production"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
