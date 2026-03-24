@@ -2,351 +2,371 @@
   <h1>設定</h1>
 </div>
 
-<%# 認証設定 %>
-<div class="card mb-4" id="auth">
-  <div class="card-header">
-    認証設定
-  </div>
-  <div class="card-body">
-    <%= form_with model: @auth_form, url: update_auth_admin_settings_path, method: :patch do |f| %>
-      <% if @auth_form.errors.any? %>
-        <div class="alert alert-danger">
-          <ul class="mb-0">
-            <% @auth_form.errors.full_messages.each do |message| %>
-              <li><%= message %></li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
+<div class="accordion" id="settingsAccordion">
+  <%# 認証設定 %>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAuth" aria-expanded="false" aria-controls="collapseAuth">
+        認証設定
+      </button>
+    </h2>
+    <div id="collapseAuth" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+      <div class="accordion-body">
+        <%= form_with model: @auth_form, url: update_auth_admin_settings_path, method: :patch do |f| %>
+          <% if @auth_form.errors.any? %>
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                <% @auth_form.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
 
-      <h6 class="text-muted mb-3">ローカル認証</h6>
-      <div class="form-check mb-2">
-        <%= f.check_box :local_auth_enabled, class: "form-check-input" %>
-        <%= f.label :local_auth_enabled, "ローカル認証を有効にする", class: "form-check-label" %>
-      </div>
+          <h6 class="text-muted mb-3">ローカル認証</h6>
+          <div class="form-check mb-2">
+            <%= f.check_box :local_auth_enabled, class: "form-check-input" %>
+            <%= f.label :local_auth_enabled, "ローカル認証を有効にする", class: "form-check-label" %>
+          </div>
 
-      <div class="form-check mb-2">
-        <%= f.check_box :local_auth_show_on_login, class: "form-check-input" %>
-        <%= f.label :local_auth_show_on_login, "ログイン画面にローカル認証フォームを表示", class: "form-check-label" %>
-      </div>
+          <div class="form-check mb-2">
+            <%= f.check_box :local_auth_show_on_login, class: "form-check-input" %>
+            <%= f.label :local_auth_show_on_login, "ログイン画面にローカル認証フォームを表示", class: "form-check-label" %>
+          </div>
 
-      <div class="form-check mb-4">
-        <%= f.check_box :self_signup_enabled, class: "form-check-input" %>
-        <%= f.label :self_signup_enabled, "新規登録を許可する", class: "form-check-label" %>
-      </div>
+          <div class="form-check mb-4">
+            <%= f.check_box :self_signup_enabled, class: "form-check-input" %>
+            <%= f.label :self_signup_enabled, "新規登録を許可する", class: "form-check-label" %>
+          </div>
 
-      <h6 class="text-muted mb-3">外部 IdP</h6>
-      <p class="card-text mb-3">
-        登録済み IdP: <span class="badge bg-secondary"><%= IdentityProvider.count %> 件</span>
-        （有効: <span class="badge bg-success"><%= IdentityProvider.enabled.count %> 件</span>）
-      </p>
-      <%= link_to "IdP 設定を管理", admin_identity_providers_path, class: "btn btn-outline-primary btn-sm mb-3" %>
+          <h6 class="text-muted mb-3">外部 IdP</h6>
+          <p class="card-text mb-3">
+            登録済み IdP: <span class="badge bg-secondary"><%= IdentityProvider.count %> 件</span>
+            （有効: <span class="badge bg-success"><%= IdentityProvider.enabled.count %> 件</span>）
+          </p>
+          <%= link_to "IdP 設定を管理", admin_identity_providers_path, class: "btn btn-outline-primary btn-sm mb-3" %>
 
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <%= f.submit "保存", class: "btn btn-primary" %>
-      </div>
-    <% end %>
-  </div>
-</div>
-
-<%# OCR設定 %>
-<div class="card mb-4" id="ocr">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <span>OCR 設定</span>
-    <% if Setting.ocr_configured? %>
-      <span class="badge bg-success">有効</span>
-    <% else %>
-      <span class="badge bg-danger">無効</span>
-    <% end %>
-  </div>
-  <div class="card-body">
-    <%= form_with model: @ocr_form, url: update_ocr_admin_settings_path, method: :patch do |f| %>
-      <% if @ocr_form.errors.any? %>
-        <div class="alert alert-danger">
-          <ul class="mb-0">
-            <% @ocr_form.errors.full_messages.each do |message| %>
-              <li><%= message %></li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
-
-      <h6 class="text-muted mb-3">API 接続設定</h6>
-      <div class="mb-3">
-        <%= f.label :endpoint, "API エンドポイント", class: "form-label" %>
-        <%= f.text_field :endpoint, class: "form-control", placeholder: "例: http://localhost:11434/api/generate" %>
-        <div class="form-text">OCR API の URL</div>
-      </div>
-
-      <div class="mb-3">
-        <%= f.label :api_key, "API キー", class: "form-label" %>
-        <%= f.text_field :api_key, class: "form-control", placeholder: "（任意）" %>
-        <div class="form-text">API 認証が必要な場合に設定（Bearer トークンとして送信）</div>
-      </div>
-
-      <div class="mb-3">
-        <%= f.label :timeout, "タイムアウト（秒）", class: "form-label" %>
-        <%= f.number_field :timeout, class: "form-control", min: 1, max: 3600, placeholder: Setting::DEFAULT_OCR_TIMEOUT, style: "max-width: 200px;" %>
-        <div class="form-text">API リクエストのタイムアウト時間（デフォルト: <%= Setting::DEFAULT_OCR_TIMEOUT %> 秒）</div>
-      </div>
-
-      <h6 class="text-muted mt-4 mb-3">モデル設定</h6>
-      <div class="mb-3">
-        <%= f.label :model, "モデル名", class: "form-label" %>
-        <%= f.text_field :model, class: "form-control", placeholder: "例: llava:latest" %>
-        <div class="form-text">OCR に使用する VLM モデル名</div>
-      </div>
-
-      <h6 class="text-muted mt-4 mb-3">プロンプト設定</h6>
-      <div class="mb-3">
-        <%= f.label :prompt, "プロンプト", class: "form-label" %>
-        <%= f.text_area :prompt, class: "form-control", rows: 6, placeholder: Setting::DEFAULT_OCR_PROMPT %>
-        <div class="form-text">空欄の場合はデフォルトのプロンプトが使用されます</div>
-      </div>
-
-      <h6 class="text-muted mt-4 mb-3">オプション設定</h6>
-      <div class="mb-3">
-        <%= f.label :options, "options (JSON)", class: "form-label" %>
-        <%= f.text_area :options, class: "form-control font-monospace", rows: 6, value: @ocr_form.options_for_display %>
-        <div class="form-text">temperature, num_predict, num_ctx などの設定を JSON 形式で指定</div>
-      </div>
-
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <%= f.submit "保存", class: "btn btn-primary" %>
-      </div>
-    <% end %>
-  </div>
-</div>
-
-<%# クォータ設定 %>
-<div class="card mb-4" id="quota">
-  <div class="card-header">
-    クォータ（容量制限）
-  </div>
-  <div class="card-body">
-    <%= form_with model: @quota_form, url: update_quota_admin_settings_path, method: :patch do |f| %>
-      <% if @quota_form.errors.any? %>
-        <div class="alert alert-danger">
-          <ul class="mb-0">
-            <% @quota_form.errors.full_messages.each do |message| %>
-              <li><%= message %></li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
-
-      <div class="mb-3">
-        <%= f.label :max_storage_per_user_mb, "ユーザーあたりの最大ストレージ容量（MB）", class: "form-label" %>
-        <%= f.number_field :max_storage_per_user_mb, class: "form-control", min: 1, style: "max-width: 200px;" %>
-        <div class="form-text">
-          1ユーザーがアップロードできるファイルの合計容量の上限を設定します。<br>
-          現在の設定: <strong><%= number_with_delimiter(Setting.max_storage_mb) %> MB</strong>
-          （<%= number_with_precision(Setting.max_storage_mb / 1024.0, precision: 2) %> GB）
-        </div>
-      </div>
-
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <%= f.submit "保存", class: "btn btn-primary" %>
-      </div>
-    <% end %>
-  </div>
-</div>
-
-<%# 保持設定 %>
-<div class="card mb-4" id="retention">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <span>ファイル保持設定</span>
-    <% if Setting.auto_purge_enabled? %>
-      <span class="badge bg-success">自動削除 有効</span>
-    <% else %>
-      <span class="badge bg-secondary">自動削除 無効</span>
-    <% end %>
-  </div>
-  <div class="card-body">
-    <%= form_with model: @retention_form, url: update_retention_admin_settings_path, method: :patch do |f| %>
-      <% if @retention_form.errors.any? %>
-        <div class="alert alert-danger">
-          <ul class="mb-0">
-            <% @retention_form.errors.full_messages.each do |message| %>
-              <li><%= message %></li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
-
-      <div class="form-check mb-3">
-        <%= f.check_box :auto_purge_enabled, class: "form-check-input" %>
-        <%= f.label :auto_purge_enabled, "自動削除を有効にする", class: "form-check-label" %>
-      </div>
-
-      <div class="mb-3">
-        <%= f.label :auto_purge_days, "保持日数", class: "form-label" %>
-        <%= f.number_field :auto_purge_days, class: "form-control", min: 1, style: "max-width: 200px;" %>
-        <div class="form-text">
-          アップロードから何日経過したファイルを削除するかを指定します。<br>
-          現在の設定: <strong><%= Setting.effective_auto_purge_days %> 日</strong>
-        </div>
-      </div>
-
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <%= f.submit "保存", class: "btn btn-primary" %>
-      </div>
-    <% end %>
-  </div>
-</div>
-
-<%# メール通知設定 %>
-<div class="card mb-4" id="notification">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <span>メール通知設定</span>
-    <% if Setting.notification_email_enabled? %>
-      <span class="badge bg-success">有効</span>
-    <% else %>
-      <span class="badge bg-secondary">無効</span>
-    <% end %>
-  </div>
-  <div class="card-body">
-    <%= form_with model: @notification_form, url: update_notification_admin_settings_path, method: :patch do |f| %>
-      <% if @notification_form.errors.any? %>
-        <div class="alert alert-danger">
-          <ul class="mb-0">
-            <% @notification_form.errors.full_messages.each do |message| %>
-              <li><%= message %></li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
-
-      <div class="form-check mb-3">
-        <%= f.check_box :enabled, class: "form-check-input" %>
-        <%= f.label :enabled, "OCR 処理完了時にメール通知を送信する", class: "form-check-label" %>
-      </div>
-
-      <div class="mb-3">
-        <%= f.label :subject, "件名", class: "form-label" %>
-        <%= f.text_field :subject, class: "form-control" %>
-      </div>
-
-      <div class="mb-3">
-        <%= f.label :body, "本文", class: "form-label" %>
-        <%= f.text_area :body, class: "form-control font-monospace", rows: 12 %>
-        <div class="form-text">
-          以下のプレースホルダーが使用できます:<br>
-          <code>{{user_name}}</code> - 利用者名<br>
-          <code>{{image_name}}</code> - ファイル名<br>
-          <code>{{ocr_duration}}</code> - 処理時間（秒）<br>
-          <code>{{image_url}}</code> - 結果ページの URL
-        </div>
-      </div>
-
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <%= f.submit "保存", class: "btn btn-primary" %>
-      </div>
-    <% end %>
-  </div>
-</div>
-
-<%# 送信メールサーバ設定 %>
-<div class="card mb-4" id="smtp">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <span>送信メールサーバ</span>
-    <% if Setting.smtp_configured? %>
-      <span class="badge bg-success">設定済み</span>
-    <% else %>
-      <span class="badge bg-secondary">未設定</span>
-    <% end %>
-  </div>
-  <div class="card-body">
-    <%= form_with model: @smtp_form, url: update_smtp_admin_settings_path, method: :patch do |f| %>
-      <% if @smtp_form.errors.any? %>
-        <div class="alert alert-danger">
-          <ul class="mb-0">
-            <% @smtp_form.errors.full_messages.each do |message| %>
-              <li><%= message %></li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
-
-      <div class="form-check mb-3">
-        <%= f.check_box :enabled, class: "form-check-input" %>
-        <%= f.label :enabled, "SMTP 送信を有効にする", class: "form-check-label" %>
-      </div>
-
-      <h6 class="text-muted mb-3">サーバ設定</h6>
-      <div class="row">
-        <div class="col-md-8 mb-3">
-          <%= f.label :address, "SMTP サーバアドレス", class: "form-label" %>
-          <%= f.text_field :address, class: "form-control", placeholder: "例: smtp.example.com" %>
-        </div>
-        <div class="col-md-4 mb-3">
-          <%= f.label :port, "ポート番号", class: "form-label" %>
-          <%= f.number_field :port, class: "form-control", min: 1, max: 65535, placeholder: "587" %>
-        </div>
-      </div>
-
-      <div class="form-check mb-3">
-        <%= f.check_box :enable_starttls, class: "form-check-input" %>
-        <%= f.label :enable_starttls, "STARTTLS を使用する", class: "form-check-label" %>
-      </div>
-
-      <h6 class="text-muted mt-4 mb-3">認証設定</h6>
-      <div class="mb-3">
-        <%= f.label :authentication, "認証方式", class: "form-label" %>
-        <%= f.select :authentication,
-            [["Plain", "plain"], ["Login", "login"], ["CRAM-MD5", "cram_md5"], ["認証なし", "none"]],
-            {},
-            class: "form-select", style: "max-width: 200px;" %>
-      </div>
-
-      <div class="mb-3">
-        <%= f.label :user_name, "ユーザー名", class: "form-label" %>
-        <%= f.text_field :user_name, class: "form-control", autocomplete: "off" %>
-      </div>
-
-      <div class="mb-3">
-        <%= f.label :password, "パスワード", class: "form-label" %>
-        <%= f.password_field :password, class: "form-control", autocomplete: "new-password",
-            placeholder: @smtp_form.password_configured? ? "（設定済み - 変更する場合のみ入力）" : "" %>
-        <% if @smtp_form.password_configured? %>
-          <div class="form-text">パスワードは設定済みです。変更する場合のみ入力してください。</div>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <%= f.submit "保存", class: "btn btn-primary" %>
+          </div>
         <% end %>
       </div>
+    </div>
+  </div>
 
-      <h6 class="text-muted mt-4 mb-3">送信設定</h6>
-      <div class="mb-3">
-        <%= f.label :from_address, "送信元メールアドレス", class: "form-label" %>
-        <%= f.email_field :from_address, class: "form-control", placeholder: "例: noreply@example.com" %>
-        <div class="form-text">メール送信時の From アドレス</div>
+  <%# OCR設定 %>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOcr" aria-expanded="false" aria-controls="collapseOcr">
+        <span class="me-2">OCR 設定</span>
+        <% if Setting.ocr_configured? %>
+          <span class="badge bg-success">有効</span>
+        <% else %>
+          <span class="badge bg-danger">無効</span>
+        <% end %>
+      </button>
+    </h2>
+    <div id="collapseOcr" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+      <div class="accordion-body">
+        <%= form_with model: @ocr_form, url: update_ocr_admin_settings_path, method: :patch do |f| %>
+          <% if @ocr_form.errors.any? %>
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                <% @ocr_form.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <h6 class="text-muted mb-3">API 接続設定</h6>
+          <div class="mb-3">
+            <%= f.label :endpoint, "API エンドポイント", class: "form-label" %>
+            <%= f.text_field :endpoint, class: "form-control", placeholder: "例: http://localhost:11434/api/generate" %>
+            <div class="form-text">OCR API の URL</div>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :api_key, "API キー", class: "form-label" %>
+            <%= f.text_field :api_key, class: "form-control", placeholder: "（任意）" %>
+            <div class="form-text">API 認証が必要な場合に設定（Bearer トークンとして送信）</div>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :timeout, "タイムアウト（秒）", class: "form-label" %>
+            <%= f.number_field :timeout, class: "form-control", min: 1, max: 3600, placeholder: Setting::DEFAULT_OCR_TIMEOUT, style: "max-width: 200px;" %>
+            <div class="form-text">API リクエストのタイムアウト時間（デフォルト: <%= Setting::DEFAULT_OCR_TIMEOUT %> 秒）</div>
+          </div>
+
+          <h6 class="text-muted mt-4 mb-3">モデル設定</h6>
+          <div class="mb-3">
+            <%= f.label :model, "モデル名", class: "form-label" %>
+            <%= f.text_field :model, class: "form-control", placeholder: "例: llava:latest" %>
+            <div class="form-text">OCR に使用する VLM モデル名</div>
+          </div>
+
+          <h6 class="text-muted mt-4 mb-3">プロンプト設定</h6>
+          <div class="mb-3">
+            <%= f.label :prompt, "プロンプト", class: "form-label" %>
+            <%= f.text_area :prompt, class: "form-control", rows: 6, placeholder: Setting::DEFAULT_OCR_PROMPT %>
+            <div class="form-text">空欄の場合はデフォルトのプロンプトが使用されます</div>
+          </div>
+
+          <h6 class="text-muted mt-4 mb-3">オプション設定</h6>
+          <div class="mb-3">
+            <%= f.label :options, "options (JSON)", class: "form-label" %>
+            <%= f.text_area :options, class: "form-control font-monospace", rows: 6, value: @ocr_form.options_for_display %>
+            <div class="form-text">temperature, num_predict, num_ctx などの設定を JSON 形式で指定</div>
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <%= f.submit "保存", class: "btn btn-primary" %>
+          </div>
+        <% end %>
       </div>
+    </div>
+  </div>
 
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <%= f.submit "保存", class: "btn btn-primary" %>
-      </div>
-    <% end %>
+  <%# 送信メールサーバ設定 %>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSmtp" aria-expanded="false" aria-controls="collapseSmtp">
+        <span class="me-2">送信メールサーバ</span>
+        <% if Setting.smtp_configured? %>
+          <span class="badge bg-success">設定済み</span>
+        <% else %>
+          <span class="badge bg-secondary">未設定</span>
+        <% end %>
+      </button>
+    </h2>
+    <div id="collapseSmtp" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+      <div class="accordion-body">
+        <%= form_with model: @smtp_form, url: update_smtp_admin_settings_path, method: :patch do |f| %>
+          <% if @smtp_form.errors.any? %>
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                <% @smtp_form.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
 
-    <hr class="my-4">
+          <div class="form-check mb-3">
+            <%= f.check_box :enabled, class: "form-check-input" %>
+            <%= f.label :enabled, "SMTP 送信を有効にする", class: "form-check-label" %>
+          </div>
 
-    <div data-controller="smtp-test">
-      <h6 class="text-muted mb-3">テストメール送信</h6>
-      <p class="small text-muted mb-3">上記の設定内容でテストメールを送信します。保存前の設定でもテストできます。</p>
+          <h6 class="text-muted mb-3">サーバ設定</h6>
+          <div class="row">
+            <div class="col-md-8 mb-3">
+              <%= f.label :address, "SMTP サーバアドレス", class: "form-label" %>
+              <%= f.text_field :address, class: "form-control", placeholder: "例: smtp.example.com" %>
+            </div>
+            <div class="col-md-4 mb-3">
+              <%= f.label :port, "ポート番号", class: "form-label" %>
+              <%= f.number_field :port, class: "form-control", min: 1, max: 65535, placeholder: "587" %>
+            </div>
+          </div>
 
-      <div class="row align-items-end">
-        <div class="col-md-8 mb-3">
-          <label for="test_email_address" class="form-label">宛先メールアドレス</label>
-          <input type="email" class="form-control" id="test_email_address"
-                 placeholder="test@example.com" data-smtp-test-target="email">
+          <div class="form-check mb-3">
+            <%= f.check_box :enable_starttls, class: "form-check-input" %>
+            <%= f.label :enable_starttls, "STARTTLS を使用する", class: "form-check-label" %>
+          </div>
+
+          <h6 class="text-muted mt-4 mb-3">認証設定</h6>
+          <div class="mb-3">
+            <%= f.label :authentication, "認証方式", class: "form-label" %>
+            <%= f.select :authentication,
+                [["Plain", "plain"], ["Login", "login"], ["CRAM-MD5", "cram_md5"], ["認証なし", "none"]],
+                {},
+                class: "form-select", style: "max-width: 200px;" %>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :user_name, "ユーザー名", class: "form-label" %>
+            <%= f.text_field :user_name, class: "form-control", autocomplete: "off" %>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :password, "パスワード", class: "form-label" %>
+            <%= f.password_field :password, class: "form-control", autocomplete: "new-password",
+                placeholder: @smtp_form.password_configured? ? "（設定済み - 変更する場合のみ入力）" : "" %>
+            <% if @smtp_form.password_configured? %>
+              <div class="form-text">パスワードは設定済みです。変更する場合のみ入力してください。</div>
+            <% end %>
+          </div>
+
+          <h6 class="text-muted mt-4 mb-3">送信設定</h6>
+          <div class="mb-3">
+            <%= f.label :from_address, "送信元メールアドレス", class: "form-label" %>
+            <%= f.email_field :from_address, class: "form-control", placeholder: "例: noreply@example.com" %>
+            <div class="form-text">メール送信時の From アドレス</div>
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <%= f.submit "保存", class: "btn btn-primary" %>
+          </div>
+        <% end %>
+
+        <hr class="my-4">
+
+        <div data-controller="smtp-test">
+          <h6 class="text-muted mb-3">テストメール送信</h6>
+          <p class="small text-muted mb-3">上記の設定内容でテストメールを送信します。保存前の設定でもテストできます。</p>
+
+          <div class="row align-items-end">
+            <div class="col-md-8 mb-3">
+              <label for="test_email_address" class="form-label">宛先メールアドレス</label>
+              <input type="email" class="form-control" id="test_email_address"
+                     placeholder="test@example.com" data-smtp-test-target="email">
+            </div>
+            <div class="col-md-4 mb-3">
+              <button type="button" class="btn btn-outline-secondary w-100"
+                      data-action="click->smtp-test#send" data-smtp-test-target="button">
+                テストメール送信
+              </button>
+            </div>
+          </div>
+
+          <div class="d-none" data-smtp-test-target="result">
+            <div class="alert mb-0" data-smtp-test-target="message"></div>
+          </div>
         </div>
-        <div class="col-md-4 mb-3">
-          <button type="button" class="btn btn-outline-secondary w-100"
-                  data-action="click->smtp-test#send" data-smtp-test-target="button">
-            テストメール送信
-          </button>
-        </div>
       </div>
+    </div>
+  </div>
 
-      <div class="d-none" data-smtp-test-target="result">
-        <div class="alert mb-0" data-smtp-test-target="message"></div>
+  <%# ユーザファイル関連（クォータ + ファイル保持を統合） %>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUserFiles" aria-expanded="false" aria-controls="collapseUserFiles">
+        <span class="me-2">ユーザファイル関連</span>
+        <% if Setting.auto_purge_enabled? %>
+          <span class="badge bg-success">自動削除 有効</span>
+        <% else %>
+          <span class="badge bg-secondary">自動削除 無効</span>
+        <% end %>
+      </button>
+    </h2>
+    <div id="collapseUserFiles" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+      <div class="accordion-body">
+        <%# クォータ設定 %>
+        <h5 class="mb-3">クォータ（容量制限）</h5>
+        <%= form_with model: @quota_form, url: update_quota_admin_settings_path, method: :patch do |f| %>
+          <% if @quota_form.errors.any? %>
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                <% @quota_form.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <div class="mb-3">
+            <%= f.label :max_storage_per_user_mb, "ユーザーあたりの最大ストレージ容量（MB）", class: "form-label" %>
+            <%= f.number_field :max_storage_per_user_mb, class: "form-control", min: 1, style: "max-width: 200px;" %>
+            <div class="form-text">
+              1ユーザーがアップロードできるファイルの合計容量の上限を設定します。<br>
+              現在の設定: <strong><%= number_with_delimiter(Setting.max_storage_mb) %> MB</strong>
+              （<%= number_with_precision(Setting.max_storage_mb / 1024.0, precision: 2) %> GB）
+            </div>
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <%= f.submit "保存", class: "btn btn-primary" %>
+          </div>
+        <% end %>
+
+        <hr class="my-4">
+
+        <%# ファイル保持設定 %>
+        <h5 class="mb-3">ファイル保持設定</h5>
+        <%= form_with model: @retention_form, url: update_retention_admin_settings_path, method: :patch do |f| %>
+          <% if @retention_form.errors.any? %>
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                <% @retention_form.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <div class="form-check mb-3">
+            <%= f.check_box :auto_purge_enabled, class: "form-check-input" %>
+            <%= f.label :auto_purge_enabled, "自動削除を有効にする", class: "form-check-label" %>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :auto_purge_days, "保持日数", class: "form-label" %>
+            <%= f.number_field :auto_purge_days, class: "form-control", min: 1, style: "max-width: 200px;" %>
+            <div class="form-text">
+              アップロードから何日経過したファイルを削除するかを指定します。<br>
+              現在の設定: <strong><%= Setting.effective_auto_purge_days %> 日</strong>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <%= f.submit "保存", class: "btn btn-primary" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# 通知メール設定 %>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotification" aria-expanded="false" aria-controls="collapseNotification">
+        <span class="me-2">通知メール設定</span>
+        <% if Setting.notification_email_enabled? %>
+          <span class="badge bg-success">有効</span>
+        <% else %>
+          <span class="badge bg-secondary">無効</span>
+        <% end %>
+      </button>
+    </h2>
+    <div id="collapseNotification" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+      <div class="accordion-body">
+        <%= form_with model: @notification_form, url: update_notification_admin_settings_path, method: :patch do |f| %>
+          <% if @notification_form.errors.any? %>
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                <% @notification_form.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <div class="form-check mb-3">
+            <%= f.check_box :enabled, class: "form-check-input" %>
+            <%= f.label :enabled, "OCR 処理完了時にメール通知を送信する", class: "form-check-label" %>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :subject, "件名", class: "form-label" %>
+            <%= f.text_field :subject, class: "form-control" %>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :body, "本文", class: "form-label" %>
+            <%= f.text_area :body, class: "form-control font-monospace", rows: 12 %>
+            <div class="form-text">
+              以下のプレースホルダーが使用できます:<br>
+              <code>{{user_name}}</code> - 利用者名<br>
+              <code>{{image_name}}</code> - ファイル名<br>
+              <code>{{ocr_duration}}</code> - 処理時間（秒）<br>
+              <code>{{image_url}}</code> - 結果ページの URL
+            </div>
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <%= f.submit "保存", class: "btn btn-primary" %>
+          </div>
+        <% end %>
       </div>
     </div>
   </div>

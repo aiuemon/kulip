@@ -13,7 +13,7 @@ module Admin
       @auth_form = Forms::AuthSettingsForm.new(auth_settings_params)
 
       if @auth_form.save
-        redirect_to admin_settings_path(anchor: "auth"), notice: "認証設定を更新しました。"
+        redirect_to admin_settings_path(anchor: "collapseAuth"), notice: "認証設定を更新しました。"
       else
         load_other_forms
         render :show, status: :unprocessable_entity
@@ -24,7 +24,7 @@ module Admin
       @ocr_form = Forms::OcrSettingsForm.new(ocr_settings_params)
 
       if @ocr_form.save
-        redirect_to admin_settings_path(anchor: "ocr"), notice: "OCR設定を更新しました。"
+        redirect_to admin_settings_path(anchor: "collapseOcr"), notice: "OCR設定を更新しました。"
       else
         load_other_forms
         render :show, status: :unprocessable_entity
@@ -35,7 +35,7 @@ module Admin
       @quota_form = Forms::QuotaSettingsForm.new(quota_settings_params)
 
       if @quota_form.save
-        redirect_to admin_settings_path(anchor: "quota"), notice: "クォータ設定を更新しました。"
+        redirect_to admin_settings_path(anchor: "collapseUserFiles"), notice: "クォータ設定を更新しました。"
       else
         load_other_forms
         render :show, status: :unprocessable_entity
@@ -46,7 +46,7 @@ module Admin
       @retention_form = Forms::RetentionSettingsForm.new(retention_settings_params)
 
       if @retention_form.save
-        redirect_to admin_settings_path(anchor: "retention"), notice: "保持設定を更新しました。"
+        redirect_to admin_settings_path(anchor: "collapseUserFiles"), notice: "保持設定を更新しました。"
       else
         load_other_forms
         render :show, status: :unprocessable_entity
@@ -57,7 +57,7 @@ module Admin
       @notification_form = Forms::NotificationSettingsForm.new(notification_settings_params)
 
       if @notification_form.save
-        redirect_to admin_settings_path(anchor: "notification"), notice: "メール通知設定を更新しました。"
+        redirect_to admin_settings_path(anchor: "collapseNotification"), notice: "通知メール設定を更新しました。"
       else
         load_other_forms
         render :show, status: :unprocessable_entity
@@ -68,7 +68,7 @@ module Admin
       @smtp_form = Forms::SmtpSettingsForm.new(smtp_settings_params)
 
       if @smtp_form.save
-        redirect_to admin_settings_path(anchor: "smtp"), notice: "送信メールサーバ設定を更新しました。"
+        redirect_to admin_settings_path(anchor: "collapseSmtp"), notice: "送信メールサーバ設定を更新しました。"
       else
         load_other_forms
         render :show, status: :unprocessable_entity

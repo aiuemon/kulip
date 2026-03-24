@@ -30,12 +30,11 @@ module Admin
       sign_in @admin
       get admin_settings_path
       assert_response :success
-      assert_select "#auth"
-      assert_select "#ocr"
-      assert_select "#quota"
-      assert_select "#retention"
-      assert_select "#notification"
-      assert_select "#smtp"
+      assert_select "#collapseAuth"
+      assert_select "#collapseOcr"
+      assert_select "#collapseSmtp"
+      assert_select "#collapseUserFiles"
+      assert_select "#collapseNotification"
     end
 
     # Auth settings tests
@@ -47,7 +46,7 @@ module Admin
         auth_settings: { local_auth_enabled: true }
       }
 
-      assert_redirected_to admin_settings_path(anchor: "auth")
+      assert_redirected_to admin_settings_path(anchor: "collapseAuth")
       assert Setting.local_auth_enabled?
     end
 
@@ -59,7 +58,7 @@ module Admin
         auth_settings: { self_signup_enabled: true }
       }
 
-      assert_redirected_to admin_settings_path(anchor: "auth")
+      assert_redirected_to admin_settings_path(anchor: "collapseAuth")
       assert Setting.self_signup_enabled?
     end
 
@@ -71,7 +70,7 @@ module Admin
         ocr_settings: { endpoint: "http://new.example.com/api" }
       }
 
-      assert_redirected_to admin_settings_path(anchor: "ocr")
+      assert_redirected_to admin_settings_path(anchor: "collapseOcr")
       assert_equal "http://new.example.com/api", Setting.ocr_endpoint
     end
 
@@ -93,7 +92,7 @@ module Admin
         quota_settings: { max_storage_per_user_mb: 500 }
       }
 
-      assert_redirected_to admin_settings_path(anchor: "quota")
+      assert_redirected_to admin_settings_path(anchor: "collapseUserFiles")
       assert_equal 500, Setting.max_storage_per_user_mb
     end
 
@@ -106,7 +105,7 @@ module Admin
         retention_settings: { auto_purge_enabled: true, auto_purge_days: 14 }
       }
 
-      assert_redirected_to admin_settings_path(anchor: "retention")
+      assert_redirected_to admin_settings_path(anchor: "collapseUserFiles")
       assert Setting.auto_purge_enabled?
       assert_equal 14, Setting.auto_purge_days
     end
@@ -119,7 +118,7 @@ module Admin
         retention_settings: { auto_purge_enabled: false }
       }
 
-      assert_redirected_to admin_settings_path(anchor: "retention")
+      assert_redirected_to admin_settings_path(anchor: "collapseUserFiles")
       assert_not Setting.auto_purge_enabled?
     end
 
@@ -156,7 +155,7 @@ module Admin
         }
       }
 
-      assert_redirected_to admin_settings_path(anchor: "notification")
+      assert_redirected_to admin_settings_path(anchor: "collapseNotification")
       assert Setting.notification_email_enabled?
       assert_equal "テスト件名", Setting.notification_email_subject
       assert_equal "テスト本文", Setting.notification_email_body
@@ -170,7 +169,7 @@ module Admin
         notification_settings: { enabled: false }
       }
 
-      assert_redirected_to admin_settings_path(anchor: "notification")
+      assert_redirected_to admin_settings_path(anchor: "collapseNotification")
       assert_not Setting.notification_email_enabled?
     end
 
@@ -202,7 +201,7 @@ module Admin
         }
       }
 
-      assert_redirected_to admin_settings_path(anchor: "smtp")
+      assert_redirected_to admin_settings_path(anchor: "collapseSmtp")
       assert Setting.smtp_enabled?
       assert_equal "smtp.example.com", Setting.smtp_address
       assert_equal 587, Setting.smtp_port
@@ -221,7 +220,7 @@ module Admin
         smtp_settings: { enabled: false }
       }
 
-      assert_redirected_to admin_settings_path(anchor: "smtp")
+      assert_redirected_to admin_settings_path(anchor: "collapseSmtp")
       assert_not Setting.smtp_enabled?
     end
 
