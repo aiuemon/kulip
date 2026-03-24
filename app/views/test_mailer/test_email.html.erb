@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: #0d6efd; color: white; padding: 20px; text-align: center; }
+    .content { padding: 20px; background: #f8f9fa; }
+    .footer { padding: 10px; text-align: center; font-size: 12px; color: #666; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>kulip SMTP 設定テスト</h1>
+    </div>
+    <div class="content">
+      <p>このメールは kulip の SMTP 設定が正しく動作していることを確認するためのテストメールです。</p>
+      <p><strong>送信日時:</strong> <%= @sent_at.strftime("%Y-%m-%d %H:%M:%S %Z") %></p>
+      <p>このメールが届いていれば、SMTP 設定は正常に機能しています。</p>
+    </div>
+    <div class="footer">
+      <p>このメールは kulip から自動送信されています。</p>
+    </div>
+  </div>
+</body>
+</html>

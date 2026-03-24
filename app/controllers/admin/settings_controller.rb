@@ -75,7 +75,46 @@ module Admin
       end
     end
 
+    def send_test_email
+      to_address = params[:to_address]
+
+      if to_address.blank?
+        render json: { success: false, error: "宛先メールアドレスを入力してください" }, status: :unprocessable_entity
+        return
+      end
+
+      smtp_settings = build_smtp_settings_from_params
+
+      begin
+        TestMailer.test_email(to: to_address, smtp_settings: smtp_settings).deliver_now
+        render json: { success: true, message: "テストメールを送信しました" }
+      rescue => e
+        render json: { success: false, error: "送信に失敗しました: #{e.message}" }, status: :unprocessable_entity
+      end
+    end
+
     private
+
+    def build_smtp_settings_from_params
+      smtp_params = params[:smtp_settings] || {}
+
+      settings = {
+        address: smtp_params[:address].presence,
+        port: smtp_params[:port].to_i,
+        enable_starttls_auto: smtp_params[:enable_starttls] == "true" || smtp_params[:enable_starttls] == "1",
+        from_address: smtp_params[:from_address].presence
+      }
+
+      auth = smtp_params[:authentication].presence
+      if auth.present? && auth != "none"
+        settings[:authentication] = auth.to_sym
+        settings[:user_name] = smtp_params[:user_name].presence
+        # パスワードが入力されていればそれを使用、なければ保存済みのパスワードを使用
+        settings[:password] = smtp_params[:password].presence || Setting.smtp_password.presence
+      end
+
+      settings.compact
+    end
 
     def load_other_forms
       @auth_form ||= Forms::AuthSettingsForm.new

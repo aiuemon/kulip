@@ -254,5 +254,52 @@ module Admin
 
       assert_redirected_to root_path
     end
+
+    # Test email tests
+    test "send_test_email sends email successfully" do
+      sign_in @admin
+
+      post send_test_email_admin_settings_path, params: {
+        to_address: "test@example.com",
+        smtp_settings: {
+          address: "smtp.example.com",
+          port: "587",
+          authentication: "plain",
+          user_name: "user",
+          password: "pass",
+          enable_starttls: "true",
+          from_address: "noreply@example.com"
+        }
+      }
+
+      assert_response :success
+      json = JSON.parse(response.body)
+      assert json["success"]
+      assert_equal "テストメールを送信しました", json["message"]
+    end
+
+    test "send_test_email requires to_address" do
+      sign_in @admin
+
+      post send_test_email_admin_settings_path, params: {
+        to_address: "",
+        smtp_settings: { address: "smtp.example.com" }
+      }
+
+      assert_response :unprocessable_entity
+      json = JSON.parse(response.body)
+      assert_not json["success"]
+      assert_equal "宛先メールアドレスを入力してください", json["error"]
+    end
+
+    test "send_test_email requires admin" do
+      sign_in @user
+
+      post send_test_email_admin_settings_path, params: {
+        to_address: "test@example.com"
+      }
+
+      assert_redirected_to root_path
+    end
   end
 end

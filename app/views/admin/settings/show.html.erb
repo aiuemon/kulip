@@ -324,5 +324,30 @@
         <%= f.submit "保存", class: "btn btn-primary" %>
       </div>
     <% end %>
+
+    <hr class="my-4">
+
+    <div data-controller="smtp-test">
+      <h6 class="text-muted mb-3">テストメール送信</h6>
+      <p class="small text-muted mb-3">上記の設定内容でテストメールを送信します。保存前の設定でもテストできます。</p>
+
+      <div class="row align-items-end">
+        <div class="col-md-8 mb-3">
+          <label for="test_email_address" class="form-label">宛先メールアドレス</label>
+          <input type="email" class="form-control" id="test_email_address"
+                 placeholder="test@example.com" data-smtp-test-target="email">
+        </div>
+        <div class="col-md-4 mb-3">
+          <button type="button" class="btn btn-outline-secondary w-100"
+                  data-action="click->smtp-test#send" data-smtp-test-target="button">
+            テストメール送信
+          </button>
+        </div>
+      </div>
+
+      <div class="d-none" data-smtp-test-target="result">
+        <div class="alert mb-0" data-smtp-test-target="message"></div>
+      </div>
+    </div>
   </div>
 </div>
