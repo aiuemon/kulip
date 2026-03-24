@@ -3,9 +3,10 @@ services:
     image: ghcr.io/aiuemon/kulip:0.1.1
     ports:
       - "3000:80"
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgres://kulip:kulip@db:5432/kulip_production
-      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
     depends_on:
       db:
         condition: service_healthy
