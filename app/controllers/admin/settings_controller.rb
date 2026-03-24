@@ -6,6 +6,7 @@ module Admin
       @quota_form = Forms::QuotaSettingsForm.new
       @retention_form = Forms::RetentionSettingsForm.new
       @notification_form = Forms::NotificationSettingsForm.new
+      @smtp_form = Forms::SmtpSettingsForm.new
     end
 
     def update_auth
@@ -63,6 +64,17 @@ module Admin
       end
     end
 
+    def update_smtp
+      @smtp_form = Forms::SmtpSettingsForm.new(smtp_settings_params)
+
+      if @smtp_form.save
+        redirect_to admin_settings_path(anchor: "smtp"), notice: "送信メールサーバ設定を更新しました。"
+      else
+        load_other_forms
+        render :show, status: :unprocessable_entity
+      end
+    end
+
     private
 
     def load_other_forms
@@ -71,6 +83,7 @@ module Admin
       @quota_form ||= Forms::QuotaSettingsForm.new
       @retention_form ||= Forms::RetentionSettingsForm.new
       @notification_form ||= Forms::NotificationSettingsForm.new
+      @smtp_form ||= Forms::SmtpSettingsForm.new
     end
 
     def auth_settings_params
@@ -91,6 +104,13 @@ module Admin
 
     def notification_settings_params
       params.require(:notification_settings).permit(:enabled, :subject, :body)
+    end
+
+    def smtp_settings_params
+      params.require(:smtp_settings).permit(
+        :enabled, :address, :port, :authentication,
+        :user_name, :password, :enable_starttls, :from_address
+      )
     end
   end
 end

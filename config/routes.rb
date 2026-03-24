@@ -40,6 +40,7 @@ Rails.application.routes.draw do
       patch :update_quota, on: :member
       patch :update_retention, on: :member
       patch :update_notification, on: :member
+      patch :update_smtp, on: :member
     end
     resources :users, only: %i[index] do
       member do
