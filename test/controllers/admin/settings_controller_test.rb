@@ -35,6 +35,7 @@ module Admin
       assert_select "#quota"
       assert_select "#retention"
       assert_select "#notification"
+      assert_select "#smtp"
     end
 
     # Auth settings tests
@@ -178,6 +179,77 @@ module Admin
 
       patch update_notification_admin_settings_path, params: {
         notification_settings: { enabled: true }
+      }
+
+      assert_redirected_to root_path
+    end
+
+    # SMTP settings tests
+    test "update_smtp enables smtp" do
+      sign_in @admin
+      Setting.smtp_enabled = false
+
+      patch update_smtp_admin_settings_path, params: {
+        smtp_settings: {
+          enabled: true,
+          address: "smtp.example.com",
+          port: 587,
+          authentication: "plain",
+          user_name: "user@example.com",
+          password: "secret",
+          enable_starttls: true,
+          from_address: "noreply@example.com"
+        }
+      }
+
+      assert_redirected_to admin_settings_path(anchor: "smtp")
+      assert Setting.smtp_enabled?
+      assert_equal "smtp.example.com", Setting.smtp_address
+      assert_equal 587, Setting.smtp_port
+      assert_equal "plain", Setting.smtp_authentication
+      assert_equal "user@example.com", Setting.smtp_user_name
+      assert_equal "secret", Setting.smtp_password
+      assert Setting.smtp_enable_starttls
+      assert_equal "noreply@example.com", Setting.smtp_from_address
+    end
+
+    test "update_smtp disables smtp" do
+      sign_in @admin
+      Setting.smtp_enabled = true
+
+      patch update_smtp_admin_settings_path, params: {
+        smtp_settings: { enabled: false }
+      }
+
+      assert_redirected_to admin_settings_path(anchor: "smtp")
+      assert_not Setting.smtp_enabled?
+    end
+
+    test "update_smtp validates address when enabled" do
+      sign_in @admin
+
+      patch update_smtp_admin_settings_path, params: {
+        smtp_settings: { enabled: true, address: "" }
+      }
+
+      assert_response :unprocessable_entity
+    end
+
+    test "update_smtp validates port number" do
+      sign_in @admin
+
+      patch update_smtp_admin_settings_path, params: {
+        smtp_settings: { enabled: true, address: "smtp.example.com", port: 99999 }
+      }
+
+      assert_response :unprocessable_entity
+    end
+
+    test "update_smtp requires admin" do
+      sign_in @user
+
+      patch update_smtp_admin_settings_path, params: {
+        smtp_settings: { enabled: true }
       }
 
       assert_redirected_to root_path

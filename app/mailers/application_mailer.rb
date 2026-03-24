@@ -1,4 +1,15 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "from@example.com"
   layout "mailer"
+
+  default from: -> { Setting.smtp_from_address.presence || "noreply@example.com" }
+
+  before_action :configure_smtp_settings
+
+  private
+
+  def configure_smtp_settings
+    return unless Setting.smtp_configured?
+
+    mail.delivery_method.settings.merge!(Setting.smtp_settings)
+  end
 end

@@ -58,6 +58,16 @@ class Setting < RailsSettings::Base
   field :notification_email_subject, type: :string, default: ""
   field :notification_email_body, type: :string, default: ""
 
+  # === SMTP設定 ===
+  field :smtp_enabled, type: :boolean, default: false
+  field :smtp_address, type: :string, default: ""
+  field :smtp_port, type: :integer, default: 587
+  field :smtp_authentication, type: :string, default: "plain"
+  field :smtp_user_name, type: :string, default: ""
+  field :smtp_password, type: :string, default: ""
+  field :smtp_enable_starttls, type: :boolean, default: true
+  field :smtp_from_address, type: :string, default: ""
+
   # === 互換性メソッド ===
   class << self
     # 認証設定
@@ -122,6 +132,33 @@ class Setting < RailsSettings::Base
 
     def effective_notification_body
       notification_email_body.presence || DEFAULT_NOTIFICATION_BODY
+    end
+
+    # SMTP設定
+    def smtp_enabled?
+      smtp_enabled
+    end
+
+    def smtp_configured?
+      smtp_enabled && smtp_address.present?
+    end
+
+    def smtp_settings
+      return {} unless smtp_configured?
+
+      settings = {
+        address: smtp_address,
+        port: smtp_port,
+        enable_starttls_auto: smtp_enable_starttls
+      }
+
+      if smtp_authentication.present? && smtp_authentication != "none"
+        settings[:authentication] = smtp_authentication.to_sym
+        settings[:user_name] = smtp_user_name if smtp_user_name.present?
+        settings[:password] = smtp_password if smtp_password.present?
+      end
+
+      settings
     end
   end
 end
