@@ -12,6 +12,7 @@
     </h2>
     <div id="collapseAuth" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
       <div class="accordion-body">
+        <div id="flash_auth"></div>
         <%= form_with model: @auth_form, url: update_auth_admin_settings_path, method: :patch do |f| %>
           <% if @auth_form.errors.any? %>
             <div class="alert alert-danger">
@@ -68,6 +69,7 @@
     </h2>
     <div id="collapseOcr" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
       <div class="accordion-body">
+        <div id="flash_ocr"></div>
         <%= form_with model: @ocr_form, url: update_ocr_admin_settings_path, method: :patch do |f| %>
           <% if @ocr_form.errors.any? %>
             <div class="alert alert-danger">
@@ -141,6 +143,7 @@
     </h2>
     <div id="collapseSmtp" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
       <div class="accordion-body">
+        <div id="flash_smtp"></div>
         <%= form_with model: @smtp_form, url: update_smtp_admin_settings_path, method: :patch do |f| %>
           <% if @smtp_form.errors.any? %>
             <div class="alert alert-danger">
@@ -253,6 +256,7 @@
       <div class="accordion-body">
         <%# クォータ設定 %>
         <h5 class="mb-3">クォータ（容量制限）</h5>
+        <div id="flash_quota"></div>
         <%= form_with model: @quota_form, url: update_quota_admin_settings_path, method: :patch do |f| %>
           <% if @quota_form.errors.any? %>
             <div class="alert alert-danger">
@@ -283,6 +287,7 @@
 
         <%# ファイル保持設定 %>
         <h5 class="mb-3">ファイル保持設定</h5>
+        <div id="flash_retention"></div>
         <%= form_with model: @retention_form, url: update_retention_admin_settings_path, method: :patch do |f| %>
           <% if @retention_form.errors.any? %>
             <div class="alert alert-danger">
@@ -330,6 +335,7 @@
     </h2>
     <div id="collapseNotification" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
       <div class="accordion-body">
+        <div id="flash_notification"></div>
         <%= form_with model: @notification_form, url: update_notification_admin_settings_path, method: :patch do |f| %>
           <% if @notification_form.errors.any? %>
             <div class="alert alert-danger">

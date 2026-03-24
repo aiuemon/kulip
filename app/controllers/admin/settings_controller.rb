@@ -13,10 +13,18 @@ module Admin
       @auth_form = Forms::AuthSettingsForm.new(auth_settings_params)
 
       if @auth_form.save
-        redirect_to admin_settings_path(anchor: "collapseAuth"), notice: "認証設定を更新しました。"
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(:auth, "認証設定を更新しました。", :success) }
+          format.html { redirect_to admin_settings_path(anchor: "collapseAuth"), notice: "認証設定を更新しました。" }
+        end
       else
-        load_other_forms
-        render :show, status: :unprocessable_entity
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(:auth, @auth_form.errors.full_messages.join(", "), :error) }
+          format.html do
+            load_other_forms
+            render :show, status: :unprocessable_entity
+          end
+        end
       end
     end
 
@@ -24,10 +32,18 @@ module Admin
       @ocr_form = Forms::OcrSettingsForm.new(ocr_settings_params)
 
       if @ocr_form.save
-        redirect_to admin_settings_path(anchor: "collapseOcr"), notice: "OCR設定を更新しました。"
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(:ocr, "OCR設定を更新しました。", :success) }
+          format.html { redirect_to admin_settings_path(anchor: "collapseOcr"), notice: "OCR設定を更新しました。" }
+        end
       else
-        load_other_forms
-        render :show, status: :unprocessable_entity
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(:ocr, @ocr_form.errors.full_messages.join(", "), :error) }
+          format.html do
+            load_other_forms
+            render :show, status: :unprocessable_entity
+          end
+        end
       end
     end
 
@@ -35,10 +51,18 @@ module Admin
       @quota_form = Forms::QuotaSettingsForm.new(quota_settings_params)
 
       if @quota_form.save
-        redirect_to admin_settings_path(anchor: "collapseUserFiles"), notice: "クォータ設定を更新しました。"
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(:quota, "クォータ設定を更新しました。", :success) }
+          format.html { redirect_to admin_settings_path(anchor: "collapseUserFiles"), notice: "クォータ設定を更新しました。" }
+        end
       else
-        load_other_forms
-        render :show, status: :unprocessable_entity
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(:quota, @quota_form.errors.full_messages.join(", "), :error) }
+          format.html do
+            load_other_forms
+            render :show, status: :unprocessable_entity
+          end
+        end
       end
     end
 
@@ -46,10 +70,18 @@ module Admin
       @retention_form = Forms::RetentionSettingsForm.new(retention_settings_params)
 
       if @retention_form.save
-        redirect_to admin_settings_path(anchor: "collapseUserFiles"), notice: "保持設定を更新しました。"
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(:retention, "保持設定を更新しました。", :success) }
+          format.html { redirect_to admin_settings_path(anchor: "collapseUserFiles"), notice: "保持設定を更新しました。" }
+        end
       else
-        load_other_forms
-        render :show, status: :unprocessable_entity
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(:retention, @retention_form.errors.full_messages.join(", "), :error) }
+          format.html do
+            load_other_forms
+            render :show, status: :unprocessable_entity
+          end
+        end
       end
     end
 
@@ -57,10 +89,18 @@ module Admin
       @notification_form = Forms::NotificationSettingsForm.new(notification_settings_params)
 
       if @notification_form.save
-        redirect_to admin_settings_path(anchor: "collapseNotification"), notice: "通知メール設定を更新しました。"
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(:notification, "通知メール設定を更新しました。", :success) }
+          format.html { redirect_to admin_settings_path(anchor: "collapseNotification"), notice: "通知メール設定を更新しました。" }
+        end
       else
-        load_other_forms
-        render :show, status: :unprocessable_entity
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(:notification, @notification_form.errors.full_messages.join(", "), :error) }
+          format.html do
+            load_other_forms
+            render :show, status: :unprocessable_entity
+          end
+        end
       end
     end
 
@@ -68,10 +108,18 @@ module Admin
       @smtp_form = Forms::SmtpSettingsForm.new(smtp_settings_params)
 
       if @smtp_form.save
-        redirect_to admin_settings_path(anchor: "collapseSmtp"), notice: "送信メールサーバ設定を更新しました。"
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(:smtp, "送信メールサーバ設定を更新しました。", :success) }
+          format.html { redirect_to admin_settings_path(anchor: "collapseSmtp"), notice: "送信メールサーバ設定を更新しました。" }
+        end
       else
-        load_other_forms
-        render :show, status: :unprocessable_entity
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(:smtp, @smtp_form.errors.full_messages.join(", "), :error) }
+          format.html do
+            load_other_forms
+            render :show, status: :unprocessable_entity
+          end
+        end
       end
     end
 
@@ -94,6 +142,14 @@ module Admin
     end
 
     private
+
+    def render_turbo_flash(section, message, type)
+      alert_class = type == :success ? "alert-success" : "alert-danger"
+      render turbo_stream: turbo_stream.update(
+        "flash_#{section}",
+        "<div class=\"alert #{alert_class} alert-dismissible fade show\" role=\"alert\">#{ERB::Util.html_escape(message)}<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>"
+      )
+    end
 
     def build_smtp_settings_from_params
       smtp_params = params[:smtp_settings] || {}
