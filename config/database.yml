@@ -21,8 +21,17 @@ test:
   database: storage/test.sqlite3
 
 # Production uses PostgreSQL
+# Solid Cache/Queue/Cable の gem が database 設定を要求するため、
+# すべて primary と同じ DATABASE_URL を使用する
 production:
-  adapter: postgresql
-  encoding: unicode
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  url: <%= ENV["DATABASE_URL"] %>
+  primary: &production_primary
+    adapter: postgresql
+    encoding: unicode
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+    url: <%= ENV["DATABASE_URL"] %>
+  cache:
+    <<: *production_primary
+  queue:
+    <<: *production_primary
+  cable:
+    <<: *production_primary

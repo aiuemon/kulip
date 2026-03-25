@@ -1,0 +1,16 @@
+default: &default
+  connects_to:
+    database:
+      writing: cache
+  store_options:
+    max_age: 1.week.to_i
+    max_size: 256.megabytes
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default

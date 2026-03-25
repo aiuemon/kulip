@@ -3,6 +3,20 @@
 # If running the rails server then create or migrate existing database
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
   ./bin/rails db:prepare
+
+  # Solid Cache/Queue/Cable のテーブルを作成（存在しない場合のみ）
+  ./bin/rails runner "
+    connection = ActiveRecord::Base.connection
+    unless connection.table_exists?('solid_cache_entries')
+      load Rails.root.join('db/cache_schema.rb')
+    end
+    unless connection.table_exists?('solid_queue_jobs')
+      load Rails.root.join('db/queue_schema.rb')
+    end
+    unless connection.table_exists?('solid_cable_messages')
+      load Rails.root.join('db/cable_schema.rb')
+    end
+  " || true
 fi
 
 exec "${@}"
