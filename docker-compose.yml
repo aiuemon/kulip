@@ -1,12 +1,13 @@
 services:
   app:
-    image: ghcr.io/aiuemon/kulip:0.1.16
+    image: ghcr.io/aiuemon/kulip:0.1.17
     ports:
       - "3000:80"
     env_file:
       - .env
     environment:
       DATABASE_URL: postgres://kulip:kulip@db:5432/kulip_production
+      HTTP_MAX_REQUEST_BODY: "100000000"  # 100MB
     depends_on:
       db:
         condition: service_healthy
