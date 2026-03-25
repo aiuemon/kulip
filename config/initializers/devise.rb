@@ -281,7 +281,7 @@ Devise.setup do |config|
     connection = ActiveRecord::Base.connection
     if connection.table_exists?("identity_providers")
       # モデルを使わず直接SQLで読み込む（初期化時のロード順序問題を回避）
-      rows = connection.execute("SELECT slug, provider_type, settings FROM identity_providers WHERE enabled = 1")
+      rows = connection.execute("SELECT slug, provider_type, settings FROM identity_providers WHERE enabled = TRUE")
       rows.each do |row|
         slug = row["slug"]
         provider_type = row["provider_type"]
