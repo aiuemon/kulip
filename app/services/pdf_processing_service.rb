@@ -11,7 +11,8 @@ class PdfProcessingService
   class ConversionError < Error; end
 
   DPI = 200
-  IMAGE_FORMAT = "jpeg"
+  IMAGE_FORMAT = "jpeg"  # pdftoppm のオプション名
+  FILE_EXTENSION = "jpg" # 出力ファイルの拡張子
 
   def initialize(pdf_data, filename)
     @pdf_data = pdf_data
@@ -89,13 +90,13 @@ class PdfProcessingService
     base_name = File.basename(@filename, ".*")
     images = []
 
-    # pdftoppm は page-01.png, page-02.png のように出力する
-    Dir.glob(File.join(tmpdir, "page-*.#{IMAGE_FORMAT}")).sort.each_with_index do |image_path, index|
+    # pdftoppm は page-01.jpg, page-02.jpg のように出力する
+    Dir.glob(File.join(tmpdir, "page-*.#{FILE_EXTENSION}")).sort.each_with_index do |image_path, index|
       page_number = index + 1
       images << {
         page_number: page_number,
         image_data: File.binread(image_path),
-        filename: "#{base_name}_#{page_number}.#{IMAGE_FORMAT}"
+        filename: "#{base_name}_#{page_number}.#{FILE_EXTENSION}"
       }
     end
 
