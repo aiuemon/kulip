@@ -3,10 +3,6 @@
 # If running the rails server then create or migrate existing database
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
   ./bin/rails db:prepare
-  # cache/queue/cable は primary と同じ DB を使用するため、マイグレーションのみ実行
-  ./bin/rails db:migrate:cache || true
-  ./bin/rails db:migrate:queue || true
-  ./bin/rails db:migrate:cable || true
 fi
 
 exec "${@}"

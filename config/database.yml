@@ -21,19 +21,8 @@ test:
   database: storage/test.sqlite3
 
 # Production uses PostgreSQL
-# cache/queue/cable は primary と同じデータベースを使用（DATABASE_URL で指定）
 production:
-  primary: &production_default
-    adapter: postgresql
-    encoding: unicode
-    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-    url: <%= ENV["DATABASE_URL"] %>
-  cache:
-    <<: *production_default
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *production_default
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *production_default
-    migrations_paths: db/cable_migrate
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  url: <%= ENV["DATABASE_URL"] %>
