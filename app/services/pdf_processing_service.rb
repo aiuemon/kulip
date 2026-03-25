@@ -11,7 +11,7 @@ class PdfProcessingService
   class ConversionError < Error; end
 
   DPI = 200
-  IMAGE_FORMAT = "jpeg"
+  IMAGE_FORMAT = "png"
 
   def initialize(pdf_data, filename)
     @pdf_data = pdf_data
