@@ -67,7 +67,7 @@ class ImageGroupsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to image_group_path(ImageGroup.last)
-    assert_equal "1件の画像をアップロードしました。", flash[:notice]
+    assert_equal "1件のファイルをアップロードしました。", flash[:notice]
   end
 
   test "destroy deletes image group" do

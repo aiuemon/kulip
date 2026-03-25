@@ -79,3 +79,7 @@ Thumbs.db
 
 # Solargraph
 .solargraph.yml
+
+# Ignore key files for decrypting credentials and more.
+/config/*.key
+

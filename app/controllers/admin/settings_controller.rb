@@ -5,6 +5,7 @@ module Admin
       @ocr_form = Forms::OcrSettingsForm.new
       @quota_form = Forms::QuotaSettingsForm.new
       @retention_form = Forms::RetentionSettingsForm.new
+      @pdf_form = Forms::PdfSettingsForm.new
       @notification_form = Forms::NotificationSettingsForm.new
       @smtp_form = Forms::SmtpSettingsForm.new
     end
@@ -77,6 +78,25 @@ module Admin
       else
         respond_to do |format|
           format.turbo_stream { render_turbo_flash(:retention, @retention_form.errors.full_messages.join(", "), :error) }
+          format.html do
+            load_other_forms
+            render :show, status: :unprocessable_entity
+          end
+        end
+      end
+    end
+
+    def update_pdf
+      @pdf_form = Forms::PdfSettingsForm.new(pdf_settings_params)
+
+      if @pdf_form.save
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(:pdf, "PDF設定を更新しました。", :success) }
+          format.html { redirect_to admin_settings_path(anchor: "collapseUserFiles"), notice: "PDF設定を更新しました。" }
+        end
+      else
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(:pdf, @pdf_form.errors.full_messages.join(", "), :error) }
           format.html do
             load_other_forms
             render :show, status: :unprocessable_entity
@@ -177,6 +197,7 @@ module Admin
       @ocr_form ||= Forms::OcrSettingsForm.new
       @quota_form ||= Forms::QuotaSettingsForm.new
       @retention_form ||= Forms::RetentionSettingsForm.new
+      @pdf_form ||= Forms::PdfSettingsForm.new
       @notification_form ||= Forms::NotificationSettingsForm.new
       @smtp_form ||= Forms::SmtpSettingsForm.new
     end
@@ -195,6 +216,10 @@ module Admin
 
     def retention_settings_params
       params.require(:retention_settings).permit(:auto_purge_enabled, :auto_purge_days)
+    end
+
+    def pdf_settings_params
+      params.require(:pdf_settings).permit(:max_pages)
     end
 
     def notification_settings_params

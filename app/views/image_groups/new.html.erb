@@ -21,12 +21,12 @@
       </div>
 
       <div class="mb-3">
-        <label for="images" class="form-label">画像ファイル（複数選択可）</label>
+        <label for="images" class="form-label">ファイル（複数選択可）</label>
         <div class="dropzone-area p-4 border border-2 border-dashed rounded text-center">
           <p class="mb-2 text-muted">ここにファイルをドラッグ&ドロップ</p>
           <p class="mb-2 text-muted">または</p>
-          <%= file_field_tag "images[]", multiple: true, accept: "image/*", class: "form-control", data: { dropzone_target: "input", action: "change->dropzone#onChange" } %>
-          <p class="mt-2 mb-0 text-muted small" data-dropzone-target="label">JPEG, PNG, GIF 等の画像ファイルをアップロードできます</p>
+          <%= file_field_tag "images[]", multiple: true, accept: "image/*,application/pdf", class: "form-control", data: { dropzone_target: "input", action: "change->dropzone#onChange" } %>
+          <p class="mt-2 mb-0 text-muted small" data-dropzone-target="label">JPEG, PNG, GIF 等の画像ファイル、または PDF ファイルをアップロードできます（PDF は最大 <%= Setting.effective_pdf_max_pages %> ページまで）</p>
         </div>
       </div>
 

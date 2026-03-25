@@ -16,6 +16,7 @@ class Setting < RailsSettings::Base
 
   DEFAULT_MAX_STORAGE_MB = 1024
   DEFAULT_AUTO_PURGE_DAYS = 7
+  DEFAULT_PDF_MAX_PAGES = 20
 
   DEFAULT_NOTIFICATION_SUBJECT = "[kulip] 文字起こしが完了しました".freeze
   DEFAULT_NOTIFICATION_BODY = <<~BODY.freeze
@@ -52,6 +53,9 @@ class Setting < RailsSettings::Base
   # === 保持設定 ===
   field :auto_purge_enabled, type: :boolean, default: false
   field :auto_purge_days, type: :integer, default: 7
+
+  # === PDF設定 ===
+  field :pdf_max_pages, type: :integer, default: 20
 
   # === メール通知設定 ===
   field :notification_email_enabled, type: :boolean, default: false
@@ -119,6 +123,12 @@ class Setting < RailsSettings::Base
     def effective_auto_purge_days
       days = auto_purge_days
       days.present? && days > 0 ? days : DEFAULT_AUTO_PURGE_DAYS
+    end
+
+    # PDF設定
+    def effective_pdf_max_pages
+      pages = pdf_max_pages
+      pages.present? && pages > 0 ? pages : DEFAULT_PDF_MAX_PAGES
     end
 
     # メール通知設定

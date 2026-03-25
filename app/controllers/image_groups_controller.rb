@@ -32,6 +32,13 @@ class ImageGroupsController < ApplicationController
       return
     end
 
+    # PDF ページ数チェック
+    pdf_error = validate_pdf_pages(uploaded_files)
+    if pdf_error
+      redirect_to new_image_group_path, alert: pdf_error
+      return
+    end
+
     # クォータチェック
     total_size = uploaded_files.sum { |f| f.size }
     if current_user.quota_exceeded?(total_size)
@@ -51,7 +58,8 @@ class ImageGroupsController < ApplicationController
         )
       end
 
-      redirect_to image_group_path(@image_group), notice: "#{uploaded_files.size}件の画像をアップロードしました。"
+      file_count = uploaded_files.size
+      redirect_to image_group_path(@image_group), notice: "#{file_count}件のファイルをアップロードしました。"
     else
       redirect_to new_image_group_path, alert: "グループの作成に失敗しました。"
     end
@@ -81,6 +89,27 @@ class ImageGroupsController < ApplicationController
 
   def set_image_group
     @image_group = current_user.image_groups.find(params[:id])
+  end
+
+  def validate_pdf_pages(files)
+    max_pages = Setting.effective_pdf_max_pages
+
+    files.each do |file|
+      next unless file.content_type == "application/pdf"
+
+      begin
+        pdf_service = PdfProcessingService.new(file.read, file.original_filename)
+        file.rewind # read 後にポインタを戻す
+
+        if pdf_service.exceeds_page_limit?
+          return "PDF「#{file.original_filename}」のページ数（#{pdf_service.page_count}）が上限（#{max_pages}）を超えています。"
+        end
+      rescue PdfProcessingService::Error => e
+        return "PDF「#{file.original_filename}」の読み取りに失敗しました: #{e.message}"
+      end
+    end
+
+    nil
   end
 
   def generate_download_content(image, format)
