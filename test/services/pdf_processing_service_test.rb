@@ -41,10 +41,10 @@ class PdfProcessingServiceTest < ActiveSupport::TestCase
 
     assert_equal 2, result.size
     assert_equal 1, result[0][:page_number]
-    assert_equal "document_1.png", result[0][:filename]
+    assert_equal "document_1.jpg", result[0][:filename]
     assert result[0][:image_data].present?
     assert_equal 2, result[1][:page_number]
-    assert_equal "document_2.png", result[1][:filename]
+    assert_equal "document_2.jpg", result[1][:filename]
   end
 
   test "convert_to_images はページ上限を超えた場合 PageLimitExceededError を発生させる" do

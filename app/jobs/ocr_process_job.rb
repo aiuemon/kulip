@@ -79,11 +79,14 @@ class OcrProcessJob < ApplicationJob
 
     start_time = Time.current
 
+    # HEIC/HEIF の場合は PNG に変換
+    image_data, filename, content_type = prepare_image_data(image)
+
     client = OcrApiClient.new
     result = client.transcribe(
-      image_data: image.file.download,
-      filename: image.file.filename.to_s,
-      content_type: image.file.content_type
+      image_data: image_data,
+      filename: filename,
+      content_type: content_type
     )
 
     duration = (Time.current - start_time).to_i
@@ -97,10 +100,28 @@ class OcrProcessJob < ApplicationJob
 
     send_completion_notification(image)
 
+  rescue HeicProcessingService::Error => e
+    Rails.logger.error "HEIC processing failed for image #{image.id}: #{e.message}"
+    image.update!(status: "failed", ocr_result: "Error: #{e.message}")
+    raise
   rescue OcrApiClient::Error => e
     Rails.logger.error "OCR processing failed for image #{image.id}: #{e.message}"
     image.update!(status: "failed", ocr_result: "Error: #{e.message}")
     raise
+  end
+
+  def prepare_image_data(image)
+    original_data = image.file.download
+    original_filename = image.file.filename.to_s
+    original_content_type = image.file.content_type
+
+    if HeicProcessingService.heic?(original_content_type)
+      service = HeicProcessingService.new(original_data, original_filename)
+      converted = service.convert_to_png
+      [ converted[:image_data], converted[:filename], converted[:content_type] ]
+    else
+      [ original_data, original_filename, original_content_type ]
+    end
   end
 
   def send_completion_notification(image)
