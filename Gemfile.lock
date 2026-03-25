@@ -81,7 +81,7 @@ GEM
     ast (2.4.3)
     attr_required (1.0.2)
     base64 (0.3.0)
-    bcrypt (3.1.21)
+    bcrypt (3.1.22)
     bcrypt_pbkdf (1.1.2)
     bigdecimal (4.0.1)
     bindata (2.5.1)
@@ -166,7 +166,7 @@ GEM
     jbuilder (2.14.1)
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
-    json (2.19.1)
+    json (2.19.2)
     json-jwt (1.17.0)
       activesupport (>= 4.2)
       aes_key_wrap
