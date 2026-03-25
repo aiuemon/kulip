@@ -48,17 +48,17 @@ export default class extends Controller {
   }
 
   collectSmtpSettings() {
-    const form = document.querySelector("#smtp form")
+    const form = document.querySelector("#collapseSmtp form")
     if (!form) return {}
 
     return {
-      address: form.querySelector('[name="smtp_settings[address]"]')?.value || "",
-      port: form.querySelector('[name="smtp_settings[port]"]')?.value || "587",
-      authentication: form.querySelector('[name="smtp_settings[authentication]"]')?.value || "plain",
-      user_name: form.querySelector('[name="smtp_settings[user_name]"]')?.value || "",
-      password: form.querySelector('[name="smtp_settings[password]"]')?.value || "",
-      enable_starttls: form.querySelector('[name="smtp_settings[enable_starttls]"]')?.checked ? "true" : "false",
-      from_address: form.querySelector('[name="smtp_settings[from_address]"]')?.value || ""
+      address: form.querySelector('[name="smtp_form[address]"]')?.value || "",
+      port: form.querySelector('[name="smtp_form[port]"]')?.value || "587",
+      authentication: form.querySelector('[name="smtp_form[authentication]"]')?.value || "plain",
+      user_name: form.querySelector('[name="smtp_form[user_name]"]')?.value || "",
+      password: form.querySelector('[name="smtp_form[password]"]')?.value || "",
+      enable_starttls: form.querySelector('[name="smtp_form[enable_starttls]"]')?.checked ? "true" : "false",
+      from_address: form.querySelector('[name="smtp_form[from_address]"]')?.value || ""
     }
   }
 
