@@ -39,6 +39,7 @@ Rails.application.routes.draw do
       patch :update_ocr, on: :member
       patch :update_quota, on: :member
       patch :update_retention, on: :member
+      patch :update_pdf, on: :member
       patch :update_notification, on: :member
       patch :update_smtp, on: :member
       post :send_test_email, on: :member

@@ -300,5 +300,59 @@ module Admin
 
       assert_redirected_to root_path
     end
+
+    # PDF settings tests
+    test "update_pdf changes max pages" do
+      sign_in @admin
+
+      patch update_pdf_admin_settings_path, params: {
+        pdf_settings: { max_pages: 50 }
+      }
+
+      assert_redirected_to admin_settings_path(anchor: "collapseUserFiles")
+      assert_equal 50, Setting.pdf_max_pages
+    end
+
+    test "update_pdf uses default when blank" do
+      sign_in @admin
+      Setting.pdf_max_pages = 50
+
+      patch update_pdf_admin_settings_path, params: {
+        pdf_settings: { max_pages: "" }
+      }
+
+      assert_redirected_to admin_settings_path(anchor: "collapseUserFiles")
+      assert_equal Setting::DEFAULT_PDF_MAX_PAGES, Setting.pdf_max_pages
+    end
+
+    test "update_pdf validates max pages range" do
+      sign_in @admin
+
+      patch update_pdf_admin_settings_path, params: {
+        pdf_settings: { max_pages: 0 }
+      }
+
+      assert_response :unprocessable_entity
+    end
+
+    test "update_pdf validates max pages upper limit" do
+      sign_in @admin
+
+      patch update_pdf_admin_settings_path, params: {
+        pdf_settings: { max_pages: 101 }
+      }
+
+      assert_response :unprocessable_entity
+    end
+
+    test "update_pdf requires admin" do
+      sign_in @user
+
+      patch update_pdf_admin_settings_path, params: {
+        pdf_settings: { max_pages: 50 }
+      }
+
+      assert_redirected_to root_path
+    end
   end
 end

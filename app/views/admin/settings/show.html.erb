@@ -317,6 +317,36 @@
             <%= f.submit "保存", class: "btn btn-primary" %>
           </div>
         <% end %>
+
+        <hr class="my-4">
+
+        <%# PDF設定 %>
+        <h5 class="mb-3">PDF 設定</h5>
+        <div id="flash_pdf"></div>
+        <%= form_with model: @pdf_form, url: update_pdf_admin_settings_path, method: :patch do |f| %>
+          <% if @pdf_form.errors.any? %>
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                <% @pdf_form.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <div class="mb-3">
+            <%= f.label :max_pages, "PDF 最大ページ数", class: "form-label" %>
+            <%= f.number_field :max_pages, class: "form-control", min: 1, max: 100, style: "max-width: 200px;" %>
+            <div class="form-text">
+              アップロード可能な PDF のページ数上限を設定します（1〜100）。<br>
+              現在の設定: <strong><%= Setting.effective_pdf_max_pages %> ページ</strong>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <%= f.submit "保存", class: "btn btn-primary" %>
+          </div>
+        <% end %>
       </div>
     </div>
   </div>
