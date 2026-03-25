@@ -67,10 +67,12 @@ class PdfProcessingService
 
       match[1].to_i
     end
+  rescue Errno::ENOENT
+    raise ConversionError, "poppler-utils がインストールされていません。PDF 処理には poppler-utils が必要です。"
   end
 
   def convert_pdf_to_images(pdf_path, output_prefix)
-    # pdftoppm -png -r 200 input.pdf output_prefix
+    # pdftoppm -jpeg -r 200 input.pdf output_prefix
     _stdout, stderr, status = Open3.capture3(
       "pdftoppm",
       "-#{IMAGE_FORMAT}",
@@ -79,6 +81,8 @@ class PdfProcessingService
       output_prefix
     )
     raise ConversionError, "pdftoppm の実行に失敗しました: #{stderr}" unless status.success?
+  rescue Errno::ENOENT
+    raise ConversionError, "poppler-utils がインストールされていません。PDF 処理には poppler-utils が必要です。"
   end
 
   def collect_page_images(tmpdir)
