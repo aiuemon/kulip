@@ -43,7 +43,7 @@ class OcrProcessJob < ApplicationJob
       page_result = client.transcribe(
         image_data: page[:image_data],
         filename: page[:filename],
-        content_type: "image/png"
+        content_type: "image/jpeg"
       )
       results << format_page_result(page[:page_number], page[:filename], page_result)
     end
