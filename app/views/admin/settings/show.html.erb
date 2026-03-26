@@ -406,4 +406,42 @@
       </div>
     </div>
   </div>
+
+  <%# タイムゾーン設定 %>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTimezone" aria-expanded="false" aria-controls="collapseTimezone">
+        タイムゾーン設定
+      </button>
+    </h2>
+    <div id="collapseTimezone" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+      <div class="accordion-body">
+        <div id="flash_timezone"></div>
+        <%= form_with model: @timezone_form, url: update_timezone_admin_settings_path, method: :patch do |f| %>
+          <% if @timezone_form.errors.any? %>
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                <% @timezone_form.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <div class="mb-3">
+            <%= f.label :timezone, "タイムゾーン", class: "form-label" %>
+            <%= f.select :timezone, Forms::TimezoneSettingsForm.timezone_options, {}, class: "form-select", style: "max-width: 300px;" %>
+            <div class="form-text">
+              システム全体で使用するタイムゾーンを設定します。<br>
+              現在の設定: <strong><%= Setting.effective_timezone %></strong>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <%= f.submit "保存", class: "btn btn-primary" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
 </div>

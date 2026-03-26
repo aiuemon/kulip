@@ -8,6 +8,7 @@ module Admin
       @pdf_form = Forms::PdfSettingsForm.new
       @notification_form = Forms::NotificationSettingsForm.new
       @smtp_form = Forms::SmtpSettingsForm.new
+      @timezone_form = Forms::TimezoneSettingsForm.new
     end
 
     def update_auth
@@ -143,6 +144,25 @@ module Admin
       end
     end
 
+    def update_timezone
+      @timezone_form = Forms::TimezoneSettingsForm.new(timezone_settings_params)
+
+      if @timezone_form.save
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(:timezone, "タイムゾーン設定を更新しました。", :success) }
+          format.html { redirect_to admin_settings_path(anchor: "collapseTimezone"), notice: "タイムゾーン設定を更新しました。" }
+        end
+      else
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(:timezone, @timezone_form.errors.full_messages.join(", "), :error) }
+          format.html do
+            load_other_forms
+            render :show, status: :unprocessable_entity
+          end
+        end
+      end
+    end
+
     def send_test_email
       to_address = params[:to_address]
 
@@ -200,6 +220,7 @@ module Admin
       @pdf_form ||= Forms::PdfSettingsForm.new
       @notification_form ||= Forms::NotificationSettingsForm.new
       @smtp_form ||= Forms::SmtpSettingsForm.new
+      @timezone_form ||= Forms::TimezoneSettingsForm.new
     end
 
     def auth_settings_params
@@ -231,6 +252,10 @@ module Admin
         :enabled, :address, :port, :authentication,
         :user_name, :password, :enable_starttls, :from_address
       )
+    end
+
+    def timezone_settings_params
+      params.require(:timezone_settings).permit(:timezone)
     end
   end
 end
