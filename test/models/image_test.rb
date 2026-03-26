@@ -135,4 +135,64 @@ class ImageTest < ActiveSupport::TestCase
 
     assert_equal original_purged_at, image.purged_at
   end
+
+  # ocr_result_missing? tests
+  test "ocr_result_missing? returns true when completed but ocr_result is blank" do
+    image = images(:completed_image)
+    image.ocr_result = nil
+    assert image.ocr_result_missing?
+
+    image.ocr_result = ""
+    assert image.ocr_result_missing?
+  end
+
+  test "ocr_result_missing? returns false when completed and ocr_result is present" do
+    image = images(:completed_image)
+    image.ocr_result = "Some OCR result"
+    assert_not image.ocr_result_missing?
+  end
+
+  test "ocr_result_missing? returns false when not completed" do
+    image = images(:pending_image)
+    image.ocr_result = nil
+    assert_not image.ocr_result_missing?
+  end
+
+  test "ocr_result_missing? returns false when purged" do
+    image = images(:purged_image)
+    assert_not image.ocr_result_missing?
+  end
+
+  # retryable? tests
+  test "retryable? returns true for failed images" do
+    image = images(:failed_image)
+    assert image.retryable?
+  end
+
+  test "retryable? returns true for pending images" do
+    image = images(:pending_image)
+    assert image.retryable?
+  end
+
+  test "retryable? returns true for completed images with missing ocr_result" do
+    image = images(:completed_image)
+    image.ocr_result = nil
+    assert image.retryable?
+  end
+
+  test "retryable? returns false for completed images with ocr_result" do
+    image = images(:completed_image)
+    image.ocr_result = "Some result"
+    assert_not image.retryable?
+  end
+
+  test "retryable? returns false for purged images" do
+    image = images(:purged_image)
+    assert_not image.retryable?
+  end
+
+  test "retryable? returns false for processing images" do
+    image = images(:processing_image)
+    assert_not image.retryable?
+  end
 end
