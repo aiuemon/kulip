@@ -68,6 +68,10 @@ class OcrProcessJob < ApplicationJob
     Rails.logger.error "OCR processing failed for image #{image.id}: #{e.message}"
     image.update!(status: "failed", ocr_result: "Error: #{e.message}")
     raise
+  rescue StandardError => e
+    Rails.logger.error "Unexpected error processing PDF image #{image.id}: #{e.class} - #{e.message}"
+    image.update!(status: "failed", ocr_result: "Error: #{e.message}")
+    raise
   end
 
   def format_page_result(page_number, filename, result)
@@ -106,6 +110,10 @@ class OcrProcessJob < ApplicationJob
     raise
   rescue OcrApiClient::Error => e
     Rails.logger.error "OCR processing failed for image #{image.id}: #{e.message}"
+    image.update!(status: "failed", ocr_result: "Error: #{e.message}")
+    raise
+  rescue StandardError => e
+    Rails.logger.error "Unexpected error processing image #{image.id}: #{e.class} - #{e.message}"
     image.update!(status: "failed", ocr_result: "Error: #{e.message}")
     raise
   end
