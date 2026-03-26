@@ -42,6 +42,16 @@ class Image < ApplicationRecord
     purged_at.present?
   end
 
+  # ステータスが completed だが OCR 結果が空（不整合状態）
+  def ocr_result_missing?
+    completed? && ocr_result.blank? && !purged?
+  end
+
+  # 再試行が可能かどうか
+  def retryable?
+    !purged? && (failed? || pending? || ocr_result_missing?)
+  end
+
   # ファイルを削除（論理削除）
   def purge_file!
     return if purged?
@@ -54,7 +64,7 @@ class Image < ApplicationRecord
 
   # OCR 処理を再実行
   def retry_ocr!
-    return unless failed? || pending?
+    return unless retryable?
 
     update!(status: "pending", ocr_result: nil)
     enqueue_ocr_processing

@@ -51,10 +51,8 @@
         </dl>
       </div>
       <div class="card-footer">
-        <% unless @image.purged? %>
-          <% if @image.failed? || @image.pending? %>
-            <%= link_to "再試行", retry_image_path(@image), class: "btn btn-warning btn-sm", data: { turbo_method: :post } %>
-          <% end %>
+        <% if @image.retryable? %>
+          <%= link_to "再試行", retry_image_path(@image), class: "btn btn-warning btn-sm", data: { turbo_method: :post } %>
         <% end %>
         <%= link_to "削除", image_path(@image), class: "btn btn-danger btn-sm", data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" } %>
       </div>
@@ -94,6 +92,14 @@
     </div>
     <div class="card-body">
       <pre class="mb-0" style="white-space: pre-wrap; word-wrap: break-word;"><%= @image.ocr_result %></pre>
+    </div>
+  </div>
+<% elsif @image.ocr_result_missing? %>
+  <div class="card mb-4 border-warning">
+    <div class="card-header bg-warning text-dark">OCR 結果</div>
+    <div class="card-body">
+      <p class="mb-2">OCR 処理が正常に完了しませんでした。「再試行」ボタンをクリックして再処理してください。</p>
+      <%= link_to "再試行", retry_image_path(@image), class: "btn btn-warning", data: { turbo_method: :post } %>
     </div>
   </div>
 <% elsif @image.purged? %>
