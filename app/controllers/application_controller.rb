@@ -9,10 +9,15 @@ class ApplicationController < ActionController::Base
 
   before_action :require_setup_completed
   before_action :authenticate_user!
+  around_action :set_time_zone
 
   private
 
   def require_setup_completed
     redirect_to new_setup_path unless User.exists?
+  end
+
+  def set_time_zone(&block)
+    Time.use_zone(Setting.effective_timezone, &block)
   end
 end

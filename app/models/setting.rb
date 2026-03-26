@@ -18,6 +18,8 @@ class Setting < RailsSettings::Base
   DEFAULT_AUTO_PURGE_DAYS = 7
   DEFAULT_PDF_MAX_PAGES = 20
 
+  DEFAULT_TIMEZONE = "Asia/Tokyo".freeze
+
   DEFAULT_NOTIFICATION_SUBJECT = "[kulip] 文字起こしが完了しました".freeze
   DEFAULT_NOTIFICATION_BODY = <<~BODY.freeze
     {{user_name}} 様
@@ -71,6 +73,9 @@ class Setting < RailsSettings::Base
   field :smtp_password, type: :string, default: ""
   field :smtp_enable_starttls, type: :boolean, default: true
   field :smtp_from_address, type: :string, default: ""
+
+  # === タイムゾーン設定 ===
+  field :timezone, type: :string, default: "Asia/Tokyo"
 
   # === 互換性メソッド ===
   class << self
@@ -169,6 +174,12 @@ class Setting < RailsSettings::Base
       end
 
       settings
+    end
+
+    # タイムゾーン設定
+    def effective_timezone
+      tz = timezone
+      tz.present? ? tz : DEFAULT_TIMEZONE
     end
   end
 end

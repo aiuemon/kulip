@@ -35,6 +35,7 @@ module Admin
       assert_select "#collapseSmtp"
       assert_select "#collapseUserFiles"
       assert_select "#collapseNotification"
+      assert_select "#collapseTimezone"
     end
 
     # Auth settings tests
@@ -350,6 +351,38 @@ module Admin
 
       patch update_pdf_admin_settings_path, params: {
         pdf_settings: { max_pages: 50 }
+      }
+
+      assert_redirected_to root_path
+    end
+
+    # Timezone settings tests
+    test "update_timezone changes timezone" do
+      sign_in @admin
+
+      patch update_timezone_admin_settings_path, params: {
+        timezone_settings: { timezone: "America/New_York" }
+      }
+
+      assert_redirected_to admin_settings_path(anchor: "collapseTimezone")
+      assert_equal "America/New_York", Setting.timezone
+    end
+
+    test "update_timezone validates timezone" do
+      sign_in @admin
+
+      patch update_timezone_admin_settings_path, params: {
+        timezone_settings: { timezone: "Invalid/Timezone" }
+      }
+
+      assert_response :unprocessable_entity
+    end
+
+    test "update_timezone requires admin" do
+      sign_in @user
+
+      patch update_timezone_admin_settings_path, params: {
+        timezone_settings: { timezone: "America/New_York" }
       }
 
       assert_redirected_to root_path
