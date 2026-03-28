@@ -8,135 +8,27 @@ class OcrProcessJob < ApplicationJob
 
   def perform(image_id)
     image = Image.find_by(id: image_id)
-    return unless image
-    return unless image.pending?
-    return unless image.file.attached?
+    return unless processable?(image)
 
-    if pdf_file?(image)
-      process_pdf(image)
-    else
-      process_image(image)
-    end
+    strategy = select_strategy(image)
+    strategy.process
   end
 
   private
 
+  def processable?(image)
+    image && image.pending? && image.file.attached?
+  end
+
+  def select_strategy(image)
+    if pdf_file?(image)
+      OcrProcessing::PdfStrategy.new(image)
+    else
+      OcrProcessing::ImageStrategy.new(image)
+    end
+  end
+
   def pdf_file?(image)
     image.file.content_type == "application/pdf"
-  end
-
-  def process_pdf(image)
-    image.update!(status: "processing")
-
-    start_time = Time.current
-
-    pdf_service = PdfProcessingService.new(
-      image.file.download,
-      image.file.filename.to_s
-    )
-
-    page_images = pdf_service.convert_to_images
-    client = OcrApiClient.new
-    results = []
-
-    page_images.each do |page|
-      page_result = client.transcribe(
-        image_data: page[:image_data],
-        filename: page[:filename],
-        content_type: "image/jpeg"
-      )
-      results << format_page_result(page[:page_number], page[:filename], page_result)
-    end
-
-    duration = (Time.current - start_time).to_i
-    combined_result = results.join("\n\n---\n\n")
-
-    image.update!(
-      status: "completed",
-      ocr_result: combined_result,
-      ocr_duration: duration,
-      ocr_completed_at: Time.current
-    )
-
-    send_completion_notification(image)
-
-  rescue PdfProcessingService::Error => e
-    Rails.logger.error "PDF processing failed for image #{image.id}: #{e.message}"
-    image.update!(status: "failed", ocr_result: "Error: #{e.message}")
-    raise
-  rescue OcrApiClient::Error => e
-    Rails.logger.error "OCR processing failed for image #{image.id}: #{e.message}"
-    image.update!(status: "failed", ocr_result: "Error: #{e.message}")
-    raise
-  rescue StandardError => e
-    Rails.logger.error "Unexpected error processing PDF image #{image.id}: #{e.class} - #{e.message}"
-    image.update!(status: "failed", ocr_result: "Error: #{e.message}")
-    raise
-  end
-
-  def format_page_result(page_number, filename, result)
-    "## ページ #{page_number} (#{filename})\n\n#{result}"
-  end
-
-  def process_image(image)
-    image.update!(status: "processing")
-
-    start_time = Time.current
-
-    # HEIC/HEIF の場合は PNG に変換
-    image_data, filename, content_type = prepare_image_data(image)
-
-    client = OcrApiClient.new
-    result = client.transcribe(
-      image_data: image_data,
-      filename: filename,
-      content_type: content_type
-    )
-
-    duration = (Time.current - start_time).to_i
-
-    image.update!(
-      status: "completed",
-      ocr_result: result,
-      ocr_duration: duration,
-      ocr_completed_at: Time.current
-    )
-
-    send_completion_notification(image)
-
-  rescue HeicProcessingService::Error => e
-    Rails.logger.error "HEIC processing failed for image #{image.id}: #{e.message}"
-    image.update!(status: "failed", ocr_result: "Error: #{e.message}")
-    raise
-  rescue OcrApiClient::Error => e
-    Rails.logger.error "OCR processing failed for image #{image.id}: #{e.message}"
-    image.update!(status: "failed", ocr_result: "Error: #{e.message}")
-    raise
-  rescue StandardError => e
-    Rails.logger.error "Unexpected error processing image #{image.id}: #{e.class} - #{e.message}"
-    image.update!(status: "failed", ocr_result: "Error: #{e.message}")
-    raise
-  end
-
-  def prepare_image_data(image)
-    original_data = image.file.download
-    original_filename = image.file.filename.to_s
-    original_content_type = image.file.content_type
-
-    if HeicProcessingService.heic?(original_content_type)
-      service = HeicProcessingService.new(original_data, original_filename)
-      converted = service.convert_to_png
-      [ converted[:image_data], converted[:filename], converted[:content_type] ]
-    else
-      [ original_data, original_filename, original_content_type ]
-    end
-  end
-
-  def send_completion_notification(image)
-    return unless Setting.notification_email_enabled?
-
-    OcrCompletionMailer.completion_notification(image).deliver_later
-  rescue StandardError => e
-    Rails.logger.error "Failed to send completion notification for image #{image.id}: #{e.message}"
   end
 end
