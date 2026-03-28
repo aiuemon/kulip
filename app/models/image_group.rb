@@ -18,19 +18,21 @@ class ImageGroup < ApplicationRecord
   end
 
   def all_completed?
-    images.any? && images.all?(&:completed?)
+    total = status_counts.values.sum
+    total > 0 && status_counts["completed"].to_i == total
   end
 
   def any_failed?
-    images.any?(&:failed?)
+    status_counts["failed"].to_i > 0
   end
 
   def all_failed?
-    images.any? && images.all?(&:failed?)
+    total = status_counts.values.sum
+    total > 0 && status_counts["failed"].to_i == total
   end
 
   def processing?
-    images.any?(&:processing?)
+    status_counts["processing"].to_i > 0
   end
 
   def status_summary
@@ -39,5 +41,21 @@ class ImageGroup < ApplicationRecord
     return "一部失敗" if any_failed?
     return "完了" if all_completed?
     "待機中"
+  end
+
+  private
+
+  # ステータスごとのカウントをメモ化
+  # images がロード済みの場合は Ruby で集計、未ロードの場合は DB クエリを使用
+  def status_counts
+    @status_counts ||= build_status_counts
+  end
+
+  def build_status_counts
+    if images.loaded?
+      images.group_by(&:status).transform_values(&:size)
+    else
+      images.group(:status).count
+    end
   end
 end
