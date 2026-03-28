@@ -1,165 +1,78 @@
 module Admin
   class SettingsController < BaseController
+    # 設定タイプごとのメタデータ
+    # form_class: フォームクラス
+    # message: 成功時のメッセージ
+    # anchor: リダイレクト時のアンカー
+    # param_key: Strong Parameters のキー
+    # permitted: 許可するパラメータ
+    SETTING_CONFIGS = {
+      auth: {
+        form_class: Forms::AuthSettingsForm,
+        message: "認証設定を更新しました。",
+        anchor: "collapseAuth",
+        param_key: :auth_settings,
+        permitted: %i[local_auth_enabled local_auth_show_on_login self_signup_enabled]
+      },
+      ocr: {
+        form_class: Forms::OcrSettingsForm,
+        message: "OCR設定を更新しました。",
+        anchor: "collapseOcr",
+        param_key: :ocr_settings,
+        permitted: %i[endpoint api_key timeout model prompt options]
+      },
+      quota: {
+        form_class: Forms::QuotaSettingsForm,
+        message: "クォータ設定を更新しました。",
+        anchor: "collapseUserFiles",
+        param_key: :quota_settings,
+        permitted: %i[max_storage_per_user_mb]
+      },
+      retention: {
+        form_class: Forms::RetentionSettingsForm,
+        message: "保持設定を更新しました。",
+        anchor: "collapseUserFiles",
+        param_key: :retention_settings,
+        permitted: %i[auto_purge_enabled auto_purge_days]
+      },
+      pdf: {
+        form_class: Forms::PdfSettingsForm,
+        message: "PDF設定を更新しました。",
+        anchor: "collapseUserFiles",
+        param_key: :pdf_settings,
+        permitted: %i[max_pages]
+      },
+      notification: {
+        form_class: Forms::NotificationSettingsForm,
+        message: "通知メール設定を更新しました。",
+        anchor: "collapseNotification",
+        param_key: :notification_settings,
+        permitted: %i[enabled subject body]
+      },
+      smtp: {
+        form_class: Forms::SmtpSettingsForm,
+        message: "送信メールサーバ設定を更新しました。",
+        anchor: "collapseSmtp",
+        param_key: :smtp_settings,
+        permitted: %i[enabled address port authentication user_name password enable_starttls from_address]
+      },
+      timezone: {
+        form_class: Forms::TimezoneSettingsForm,
+        message: "タイムゾーン設定を更新しました。",
+        anchor: "collapseTimezone",
+        param_key: :timezone_settings,
+        permitted: %i[timezone]
+      }
+    }.freeze
+
     def show
-      @auth_form = Forms::AuthSettingsForm.new
-      @ocr_form = Forms::OcrSettingsForm.new
-      @quota_form = Forms::QuotaSettingsForm.new
-      @retention_form = Forms::RetentionSettingsForm.new
-      @pdf_form = Forms::PdfSettingsForm.new
-      @notification_form = Forms::NotificationSettingsForm.new
-      @smtp_form = Forms::SmtpSettingsForm.new
-      @timezone_form = Forms::TimezoneSettingsForm.new
+      load_all_forms
     end
 
-    def update_auth
-      @auth_form = Forms::AuthSettingsForm.new(auth_settings_params)
-
-      if @auth_form.save
-        respond_to do |format|
-          format.turbo_stream { render_turbo_flash(:auth, "認証設定を更新しました。", :success) }
-          format.html { redirect_to admin_settings_path(anchor: "collapseAuth"), notice: "認証設定を更新しました。" }
-        end
-      else
-        respond_to do |format|
-          format.turbo_stream { render_turbo_flash(:auth, @auth_form.errors.full_messages.join(", "), :error) }
-          format.html do
-            load_other_forms
-            render :show, status: :unprocessable_entity
-          end
-        end
-      end
-    end
-
-    def update_ocr
-      @ocr_form = Forms::OcrSettingsForm.new(ocr_settings_params)
-
-      if @ocr_form.save
-        respond_to do |format|
-          format.turbo_stream { render_turbo_flash(:ocr, "OCR設定を更新しました。", :success) }
-          format.html { redirect_to admin_settings_path(anchor: "collapseOcr"), notice: "OCR設定を更新しました。" }
-        end
-      else
-        respond_to do |format|
-          format.turbo_stream { render_turbo_flash(:ocr, @ocr_form.errors.full_messages.join(", "), :error) }
-          format.html do
-            load_other_forms
-            render :show, status: :unprocessable_entity
-          end
-        end
-      end
-    end
-
-    def update_quota
-      @quota_form = Forms::QuotaSettingsForm.new(quota_settings_params)
-
-      if @quota_form.save
-        respond_to do |format|
-          format.turbo_stream { render_turbo_flash(:quota, "クォータ設定を更新しました。", :success) }
-          format.html { redirect_to admin_settings_path(anchor: "collapseUserFiles"), notice: "クォータ設定を更新しました。" }
-        end
-      else
-        respond_to do |format|
-          format.turbo_stream { render_turbo_flash(:quota, @quota_form.errors.full_messages.join(", "), :error) }
-          format.html do
-            load_other_forms
-            render :show, status: :unprocessable_entity
-          end
-        end
-      end
-    end
-
-    def update_retention
-      @retention_form = Forms::RetentionSettingsForm.new(retention_settings_params)
-
-      if @retention_form.save
-        respond_to do |format|
-          format.turbo_stream { render_turbo_flash(:retention, "保持設定を更新しました。", :success) }
-          format.html { redirect_to admin_settings_path(anchor: "collapseUserFiles"), notice: "保持設定を更新しました。" }
-        end
-      else
-        respond_to do |format|
-          format.turbo_stream { render_turbo_flash(:retention, @retention_form.errors.full_messages.join(", "), :error) }
-          format.html do
-            load_other_forms
-            render :show, status: :unprocessable_entity
-          end
-        end
-      end
-    end
-
-    def update_pdf
-      @pdf_form = Forms::PdfSettingsForm.new(pdf_settings_params)
-
-      if @pdf_form.save
-        respond_to do |format|
-          format.turbo_stream { render_turbo_flash(:pdf, "PDF設定を更新しました。", :success) }
-          format.html { redirect_to admin_settings_path(anchor: "collapseUserFiles"), notice: "PDF設定を更新しました。" }
-        end
-      else
-        respond_to do |format|
-          format.turbo_stream { render_turbo_flash(:pdf, @pdf_form.errors.full_messages.join(", "), :error) }
-          format.html do
-            load_other_forms
-            render :show, status: :unprocessable_entity
-          end
-        end
-      end
-    end
-
-    def update_notification
-      @notification_form = Forms::NotificationSettingsForm.new(notification_settings_params)
-
-      if @notification_form.save
-        respond_to do |format|
-          format.turbo_stream { render_turbo_flash(:notification, "通知メール設定を更新しました。", :success) }
-          format.html { redirect_to admin_settings_path(anchor: "collapseNotification"), notice: "通知メール設定を更新しました。" }
-        end
-      else
-        respond_to do |format|
-          format.turbo_stream { render_turbo_flash(:notification, @notification_form.errors.full_messages.join(", "), :error) }
-          format.html do
-            load_other_forms
-            render :show, status: :unprocessable_entity
-          end
-        end
-      end
-    end
-
-    def update_smtp
-      @smtp_form = Forms::SmtpSettingsForm.new(smtp_settings_params)
-
-      if @smtp_form.save
-        respond_to do |format|
-          format.turbo_stream { render_turbo_flash(:smtp, "送信メールサーバ設定を更新しました。", :success) }
-          format.html { redirect_to admin_settings_path(anchor: "collapseSmtp"), notice: "送信メールサーバ設定を更新しました。" }
-        end
-      else
-        respond_to do |format|
-          format.turbo_stream { render_turbo_flash(:smtp, @smtp_form.errors.full_messages.join(", "), :error) }
-          format.html do
-            load_other_forms
-            render :show, status: :unprocessable_entity
-          end
-        end
-      end
-    end
-
-    def update_timezone
-      @timezone_form = Forms::TimezoneSettingsForm.new(timezone_settings_params)
-
-      if @timezone_form.save
-        respond_to do |format|
-          format.turbo_stream { render_turbo_flash(:timezone, "タイムゾーン設定を更新しました。", :success) }
-          format.html { redirect_to admin_settings_path(anchor: "collapseTimezone"), notice: "タイムゾーン設定を更新しました。" }
-        end
-      else
-        respond_to do |format|
-          format.turbo_stream { render_turbo_flash(:timezone, @timezone_form.errors.full_messages.join(", "), :error) }
-          format.html do
-            load_other_forms
-            render :show, status: :unprocessable_entity
-          end
-        end
+    # 各設定タイプの update アクションを動的に定義
+    SETTING_CONFIGS.each_key do |setting_type|
+      define_method("update_#{setting_type}") do
+        update_setting(setting_type)
       end
     end
 
@@ -182,6 +95,32 @@ module Admin
     end
 
     private
+
+    def update_setting(setting_type)
+      config = SETTING_CONFIGS[setting_type]
+      form = config[:form_class].new(setting_params(setting_type))
+      instance_variable_set("@#{setting_type}_form", form)
+
+      if form.save
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(setting_type, config[:message], :success) }
+          format.html { redirect_to admin_settings_path(anchor: config[:anchor]), notice: config[:message] }
+        end
+      else
+        respond_to do |format|
+          format.turbo_stream { render_turbo_flash(setting_type, form.errors.full_messages.join(", "), :error) }
+          format.html do
+            load_other_forms(setting_type)
+            render :show, status: :unprocessable_entity
+          end
+        end
+      end
+    end
+
+    def setting_params(setting_type)
+      config = SETTING_CONFIGS[setting_type]
+      params.require(config[:param_key]).permit(config[:permitted])
+    end
 
     def render_turbo_flash(section, message, type)
       alert_class = type == :success ? "alert-success" : "alert-danger"
@@ -212,50 +151,19 @@ module Admin
       settings.compact
     end
 
-    def load_other_forms
-      @auth_form ||= Forms::AuthSettingsForm.new
-      @ocr_form ||= Forms::OcrSettingsForm.new
-      @quota_form ||= Forms::QuotaSettingsForm.new
-      @retention_form ||= Forms::RetentionSettingsForm.new
-      @pdf_form ||= Forms::PdfSettingsForm.new
-      @notification_form ||= Forms::NotificationSettingsForm.new
-      @smtp_form ||= Forms::SmtpSettingsForm.new
-      @timezone_form ||= Forms::TimezoneSettingsForm.new
+    def load_all_forms
+      SETTING_CONFIGS.each do |setting_type, config|
+        instance_variable_set("@#{setting_type}_form", config[:form_class].new)
+      end
     end
 
-    def auth_settings_params
-      params.require(:auth_settings).permit(:local_auth_enabled, :local_auth_show_on_login, :self_signup_enabled)
-    end
+    def load_other_forms(exclude_type = nil)
+      SETTING_CONFIGS.each do |setting_type, config|
+        next if setting_type == exclude_type
 
-    def ocr_settings_params
-      params.require(:ocr_settings).permit(:endpoint, :api_key, :timeout, :model, :prompt, :options)
-    end
-
-    def quota_settings_params
-      params.require(:quota_settings).permit(:max_storage_per_user_mb)
-    end
-
-    def retention_settings_params
-      params.require(:retention_settings).permit(:auto_purge_enabled, :auto_purge_days)
-    end
-
-    def pdf_settings_params
-      params.require(:pdf_settings).permit(:max_pages)
-    end
-
-    def notification_settings_params
-      params.require(:notification_settings).permit(:enabled, :subject, :body)
-    end
-
-    def smtp_settings_params
-      params.require(:smtp_settings).permit(
-        :enabled, :address, :port, :authentication,
-        :user_name, :password, :enable_starttls, :from_address
-      )
-    end
-
-    def timezone_settings_params
-      params.require(:timezone_settings).permit(:timezone)
+        var_name = "@#{setting_type}_form"
+        instance_variable_set(var_name, config[:form_class].new) unless instance_variable_get(var_name)
+      end
     end
   end
 end
