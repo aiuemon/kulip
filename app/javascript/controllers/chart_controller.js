@@ -10,9 +10,13 @@ export default class extends Controller {
   }
 
   connect() {
-    // Chart.js is loaded via script tag in the view
+    this.initChart()
+  }
+
+  initChart() {
     if (typeof Chart === "undefined") {
-      console.error("Chart.js is not loaded")
+      // Chart.js がまだ読み込まれていない場合は少し待ってリトライ
+      setTimeout(() => this.initChart(), 100)
       return
     }
 

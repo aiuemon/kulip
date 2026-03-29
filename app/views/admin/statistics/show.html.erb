@@ -1,5 +1,5 @@
 <% content_for :head do %>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" data-turbo-track="reload"></script>
 <% end %>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -13,7 +13,7 @@
     <div class="card text-center">
       <div class="card-body">
         <h5 class="card-title text-muted">期間中の利用者数</h5>
-        <p class="display-6"><%= @daily_users.values.sum %> 人</p>
+        <p class="display-6"><%= @summary[:unique_users] %> 人</p>
       </div>
     </div>
   </div>
@@ -21,7 +21,7 @@
     <div class="card text-center">
       <div class="card-body">
         <h5 class="card-title text-muted">期間中のアップロード数</h5>
-        <p class="display-6"><%= @daily_images.values.sum %> 枚</p>
+        <p class="display-6"><%= @summary[:total_images] %> 枚</p>
       </div>
     </div>
   </div>
@@ -29,7 +29,7 @@
     <div class="card text-center">
       <div class="card-body">
         <h5 class="card-title text-muted">期間中の処理時間合計</h5>
-        <p class="display-6"><%= format_duration_short(@daily_ocr_duration.values.sum) %></p>
+        <p class="display-6"><%= format_duration_short(@summary[:total_ocr_duration]) %></p>
       </div>
     </div>
   </div>
