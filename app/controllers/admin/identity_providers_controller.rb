@@ -1,5 +1,9 @@
 module Admin
   class IdentityProvidersController < BaseController
+    # プロバイダータイプごとの許可される settings キー
+    SAML_SETTINGS_KEYS = %w[idp_sso_url idp_slo_url idp_cert sp_entity_id].freeze
+    OIDC_SETTINGS_KEYS = %w[issuer client_id client_secret redirect_uri].freeze
+
     before_action :set_identity_provider, only: %i[show edit update destroy]
 
     def index
@@ -89,12 +93,30 @@ module Admin
         :provider_type, :name, :slug, :enabled, :show_on_login
       )
 
-      # settings をネストしたパラメータから取得
+      # settings をホワイトリスト形式でフィルタリング
       if params[:identity_provider][:settings].present?
-        permitted[:settings] = params[:identity_provider][:settings].to_unsafe_h
+        permitted[:settings] = filter_settings_params
       end
 
       permitted
+    end
+
+    def filter_settings_params
+      provider_type = params[:identity_provider][:provider_type]
+      whitelist = settings_whitelist_for(provider_type)
+
+      params[:identity_provider][:settings]
+        .to_unsafe_h
+        .slice(*whitelist)
+        .transform_values { |v| v.is_a?(String) ? v.strip : v }
+    end
+
+    def settings_whitelist_for(provider_type)
+      case provider_type
+      when "saml" then SAML_SETTINGS_KEYS
+      when "oidc" then OIDC_SETTINGS_KEYS
+      else []
+      end
     end
   end
 end
