@@ -1,7 +1,4 @@
 import { Controller } from "@hotwired/stimulus"
-import { Chart, registerables } from "chart.js"
-
-Chart.register(...registerables)
 
 export default class extends Controller {
   static values = {
@@ -13,6 +10,16 @@ export default class extends Controller {
   }
 
   connect() {
+    this.initChart()
+  }
+
+  initChart() {
+    if (typeof Chart === "undefined") {
+      // Chart.js がまだ読み込まれていない場合は少し待ってリトライ
+      setTimeout(() => this.initChart(), 100)
+      return
+    }
+
     this.chart = new Chart(this.element, {
       type: this.typeValue,
       data: {
