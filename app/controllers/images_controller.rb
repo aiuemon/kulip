@@ -31,7 +31,7 @@ class ImagesController < ApplicationController
     end
 
     format = params[:format] || "txt"
-    content, filename, content_type = generate_download_content(@image, format)
+    content, filename, content_type = DownloadContentFormatter.new(@image, format).generate
 
     send_data content, filename: filename, type: content_type, disposition: "attachment"
   end
@@ -40,19 +40,5 @@ class ImagesController < ApplicationController
 
   def set_image
     @image = current_user.images.find(params[:id])
-  end
-
-  def generate_download_content(image, format)
-    base_name = File.basename(image.name, ".*")
-
-    case format
-    when "md", "markdown"
-      content = "# #{image.name}\n\n#{image.ocr_result}"
-      [ content, "#{base_name}.md", "text/markdown" ]
-    when "txt", "text"
-      [ image.ocr_result, "#{base_name}.txt", "text/plain" ]
-    else
-      [ image.ocr_result, "#{base_name}.txt", "text/plain" ]
-    end
   end
 end

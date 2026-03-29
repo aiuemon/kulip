@@ -112,26 +112,12 @@ class ImageGroupsController < ApplicationController
     nil
   end
 
-  def generate_download_content(image, format)
-    base_name = File.basename(image.name, ".*")
-
-    case format
-    when "md", "markdown"
-      content = "# #{image.name}\n\n#{image.ocr_result}"
-      [ content, "#{base_name}.md", "text/markdown" ]
-    when "txt", "text"
-      [ image.ocr_result, "#{base_name}.txt", "text/plain" ]
-    else
-      [ image.ocr_result, "#{base_name}.txt", "text/plain" ]
-    end
-  end
-
   def generate_zip(images, format)
     require "zip"
 
     stringio = Zip::OutputStream.write_buffer do |zio|
       images.each do |image|
-        content, filename, = generate_download_content(image, format)
+        content, filename, = DownloadContentFormatter.new(image, format).generate
         zio.put_next_entry(filename)
         zio.write(content)
       end
