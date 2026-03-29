@@ -5,6 +5,7 @@ module Admin
       @daily_users = daily_active_users
       @daily_images = daily_uploaded_images
       @daily_ocr_duration = daily_ocr_total_duration
+      @summary = build_summary
     end
 
     private
@@ -31,6 +32,17 @@ module Admin
 
     def date_range_query
       @date_range.first.beginning_of_day..@date_range.last.end_of_day
+    end
+
+    def build_summary
+      images = Image.where(created_at: date_range_query)
+      {
+        unique_users: images.distinct.count(:user_id),
+        total_images: images.count,
+        total_ocr_duration: Image.where(ocr_completed_at: date_range_query)
+                                 .where.not(ocr_duration: nil)
+                                 .sum(:ocr_duration)
+      }
     end
   end
 end

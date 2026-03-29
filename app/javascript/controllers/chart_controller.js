@@ -1,4 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
+import { Chart, registerables } from "chart.js"
+
+Chart.register(...registerables)
 
 export default class extends Controller {
   static values = {
@@ -10,12 +13,6 @@ export default class extends Controller {
   }
 
   connect() {
-    // Chart.js is loaded via script tag in the view
-    if (typeof Chart === "undefined") {
-      console.error("Chart.js is not loaded")
-      return
-    }
-
     this.chart = new Chart(this.element, {
       type: this.typeValue,
       data: {
