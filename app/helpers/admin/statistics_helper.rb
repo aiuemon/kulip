@@ -5,7 +5,10 @@ module Admin
     end
 
     def chart_data(daily_hash, date_range)
-      date_range.map { |date| daily_hash[date.to_s] || 0 }
+      # DATE() の戻り値が DB によって異なる（SQLite: String, PostgreSQL: Date）ため
+      # キーを文字列に正規化してから検索
+      normalized = daily_hash.transform_keys(&:to_s)
+      date_range.map { |date| normalized[date.to_s] || 0 }
     end
 
     def format_duration_short(seconds)
