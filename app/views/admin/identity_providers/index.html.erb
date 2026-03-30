@@ -6,6 +6,29 @@
   </div>
 </div>
 
+<%# SAML SP メタデータ %>
+<div class="card mb-4">
+  <div class="card-header">
+    SAML SP メタデータ
+  </div>
+  <div class="card-body">
+    <p class="card-text text-muted">IdP に本システムを SP として登録する際に、このメタデータ URL または XML ファイルを使用してください。</p>
+    <div class="mb-3">
+      <label class="form-label">メタデータ URL</label>
+      <div class="input-group">
+        <input type="text" class="form-control" value="<%= saml_metadata_url %>" readonly id="saml-metadata-url">
+        <button class="btn btn-outline-secondary" type="button" data-controller="clipboard" data-action="click->clipboard#copy" data-clipboard-target-value="#saml-metadata-url">
+          コピー
+        </button>
+      </div>
+    </div>
+    <div>
+      <%= link_to "XML ファイルをダウンロード", saml_metadata_path(download: true), class: "btn btn-outline-primary" %>
+      <%= link_to "メタデータを表示", saml_metadata_path, class: "btn btn-outline-secondary", target: "_blank" %>
+    </div>
+  </div>
+</div>
+
 <% if @identity_providers.any? %>
   <div class="table-responsive">
     <table class="table table-striped table-hover">
