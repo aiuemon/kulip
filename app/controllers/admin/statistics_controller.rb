@@ -1,7 +1,9 @@
 module Admin
   class StatisticsController < BaseController
     def show
-      @date_range = 30.days.ago.to_date..Date.current
+      @start_date = parse_date(params[:start_date], 30.days.ago.to_date)
+      @end_date = parse_date(params[:end_date], Date.current)
+      @date_range = @start_date..@end_date
       @daily_users = daily_active_users
       @daily_images = daily_uploaded_images
       @daily_ocr_duration = daily_ocr_total_duration
@@ -9,6 +11,13 @@ module Admin
     end
 
     private
+
+    def parse_date(param, default)
+      return default if param.blank?
+      Date.parse(param)
+    rescue ArgumentError
+      default
+    end
 
     def daily_active_users
       Image.where(created_at: date_range_query)

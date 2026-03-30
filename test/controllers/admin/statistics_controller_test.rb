@@ -48,5 +48,33 @@ module Admin
       assert_response :success
       assert_select "canvas[data-controller='chart']", 3
     end
+
+    test "show displays date selection form" do
+      sign_in @admin
+      get admin_statistics_path
+      assert_response :success
+      assert_select "input[type='date'][name='start_date']"
+      assert_select "input[type='date'][name='end_date']"
+      assert_select "input[type='submit'][value='表示']"
+    end
+
+    test "show with custom date range" do
+      sign_in @admin
+      start_date = 7.days.ago.to_date
+      end_date = Date.current
+      get admin_statistics_path, params: { start_date: start_date, end_date: end_date }
+      assert_response :success
+      assert_select "input[name='start_date'][value='#{start_date}']"
+      assert_select "input[name='end_date'][value='#{end_date}']"
+    end
+
+    test "show with invalid date falls back to default" do
+      sign_in @admin
+      get admin_statistics_path, params: { start_date: "invalid", end_date: "invalid" }
+      assert_response :success
+      # デフォルト値が使われることを確認（エラーにならない）
+      assert_select "input[name='start_date']"
+      assert_select "input[name='end_date']"
+    end
   end
 end

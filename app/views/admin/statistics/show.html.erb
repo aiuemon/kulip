@@ -4,7 +4,31 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1>統計情報</h1>
-  <span class="text-muted">過去30日間</span>
+</div>
+
+<%# 期間選択フォーム %>
+<div class="card mb-4">
+  <div class="card-body">
+    <%= form_with url: admin_statistics_path, method: :get, local: true, class: "row g-3 align-items-end" do %>
+      <div class="col-auto">
+        <%= label_tag :start_date, "開始日", class: "form-label" %>
+        <%= date_field_tag :start_date, @start_date, class: "form-control", max: Date.current %>
+      </div>
+      <div class="col-auto">
+        <%= label_tag :end_date, "終了日", class: "form-label" %>
+        <%= date_field_tag :end_date, @end_date, class: "form-control", max: Date.current %>
+      </div>
+      <div class="col-auto">
+        <%= submit_tag "表示", class: "btn btn-primary" %>
+      </div>
+      <div class="col-auto">
+        <%= link_to "リセット", admin_statistics_path, class: "btn btn-outline-secondary" %>
+      </div>
+      <div class="col-auto ms-auto">
+        <span class="text-muted"><%= @start_date.strftime("%Y/%m/%d") %> 〜 <%= @end_date.strftime("%Y/%m/%d") %>（<%= (@end_date - @start_date).to_i + 1 %>日間）</span>
+      </div>
+    <% end %>
+  </div>
 </div>
 
 <%# サマリーカード %>
