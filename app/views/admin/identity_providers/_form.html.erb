@@ -38,8 +38,7 @@
   <h6 class="text-muted mb-3"><%= @identity_provider.provider_type&.upcase %> 設定</h6>
 
   <% if @identity_provider.provider_type == "saml" %>
-    <% if @identity_provider.new_record? %>
-      <div class="card bg-light mb-4" data-controller="saml-metadata">
+    <div class="card bg-light mb-4" data-controller="saml-metadata">
         <div class="card-body">
           <h6 class="card-title">IdP メタデータから自動入力</h6>
           <p class="card-text small text-muted">IdP のメタデータ XML をアップロードするか、URL を指定して設定を自動入力できます。</p>
@@ -76,8 +75,7 @@
             <div class="alert alert-info mb-0 py-2" data-saml-metadata-target="statusMessage"></div>
           </div>
         </div>
-      </div>
-    <% end %>
+    </div>
 
     <div class="mb-3">
       <%= label_tag "settings_idp_sso_url", "IdP SSO URL", class: "form-label" %>
