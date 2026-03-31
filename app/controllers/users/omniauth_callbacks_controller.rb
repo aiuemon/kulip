@@ -2,17 +2,19 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   # SAML/OIDC コールバックは外部 IdP からの POST リクエストのため CSRF 検証をスキップ
   skip_before_action :verify_authenticity_token
 
-  # 動的に IdP のコールバックを処理
-  def method_missing(method_name, *args)
-    if method_name.to_s.start_with?("saml_", "oidc_")
-      handle_omniauth(method_name.to_s)
-    else
-      super
+  # DB から IdP を読み込んで動的にコールバックメソッドを定義
+  # 注意: IdP を追加・変更した後はアプリの再起動が必要
+  begin
+    if ActiveRecord::Base.connection.table_exists?("identity_providers")
+      IdentityProvider.where(enabled: true).find_each do |idp|
+        method_name = "#{idp.provider_type}_#{idp.slug}"
+        define_method(method_name) do
+          handle_omniauth(method_name)
+        end
+      end
     end
-  end
-
-  def respond_to_missing?(method_name, include_private = false)
-    method_name.to_s.start_with?("saml_", "oidc_") || super
+  rescue ActiveRecord::NoDatabaseError, ActiveRecord::ConnectionNotEstablished, ActiveRecord::StatementInvalid
+    # マイグレーション前、DB接続不可、テーブルが存在しない場合はスキップ
   end
 
   def failure
