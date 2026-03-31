@@ -1,5 +1,6 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
-  skip_before_action :verify_authenticity_token, only: %i[saml]
+  # SAML/OIDC コールバックは外部 IdP からの POST リクエストのため CSRF 検証をスキップ
+  skip_before_action :verify_authenticity_token
 
   # 動的に IdP のコールバックを処理
   def method_missing(method_name, *args)
