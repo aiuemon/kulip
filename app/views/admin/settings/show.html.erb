@@ -35,22 +35,52 @@
             <%= f.label :local_auth_show_on_login, "ログイン画面にローカル認証フォームを表示", class: "form-check-label" %>
           </div>
 
-          <div class="form-check mb-4">
+          <div class="form-check mb-3">
             <%= f.check_box :self_signup_enabled, class: "form-check-input" %>
             <%= f.label :self_signup_enabled, "新規登録を許可する", class: "form-check-label" %>
           </div>
-
-          <h6 class="text-muted mb-3">外部 IdP</h6>
-          <p class="card-text mb-3">
-            登録済み IdP: <span class="badge bg-secondary"><%= IdentityProvider.count %> 件</span>
-            （有効: <span class="badge bg-success"><%= IdentityProvider.enabled.count %> 件</span>）
-          </p>
-          <%= link_to "IdP 設定を管理", admin_identity_providers_path, class: "btn btn-outline-primary btn-sm mb-3" %>
 
           <div class="d-grid gap-2 d-md-flex justify-content-md-end">
             <%= f.submit "保存", class: "btn btn-primary" %>
           </div>
         <% end %>
+
+        <hr class="my-4">
+
+        <h6 class="text-muted mb-3">パスキー</h6>
+        <div id="flash_passkey"></div>
+        <%= form_with model: @passkey_form, url: update_passkey_admin_settings_path, method: :patch do |f| %>
+          <% if @passkey_form.errors.any? %>
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                <% @passkey_form.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <div class="form-check mb-3">
+            <%= f.check_box :enabled, class: "form-check-input" %>
+            <%= f.label :enabled, "パスキー認証を有効にする", class: "form-check-label" %>
+          </div>
+          <p class="text-muted small mb-3">
+            有効にすると、ユーザーはパスキー（WebAuthn）を登録してログインに使用できます。
+          </p>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <%= f.submit "保存", class: "btn btn-primary" %>
+          </div>
+        <% end %>
+
+        <hr class="my-4">
+
+        <h6 class="text-muted mb-3">外部 IdP</h6>
+        <p class="card-text mb-3">
+          登録済み IdP: <span class="badge bg-secondary"><%= IdentityProvider.count %> 件</span>
+          （有効: <span class="badge bg-success"><%= IdentityProvider.enabled.count %> 件</span>）
+        </p>
+        <%= link_to "IdP 設定を管理", admin_identity_providers_path, class: "btn btn-outline-primary btn-sm" %>
       </div>
     </div>
   </div>

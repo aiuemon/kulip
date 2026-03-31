@@ -36,6 +36,7 @@ Rails.application.routes.draw do
     end
     resource :settings, only: [ :show ] do
       patch :update_auth, on: :member
+      patch :update_passkey, on: :member
       patch :update_ocr, on: :member
       patch :update_quota, on: :member
       patch :update_retention, on: :member
@@ -51,6 +52,13 @@ Rails.application.routes.draw do
       end
     end
     resources :images, only: %i[index destroy]
+  end
+
+  # パスキー
+  namespace :passkeys do
+    resources :registrations, only: %i[new create]
+    resources :sessions, only: %i[new create]
+    resources :credentials, only: %i[index update destroy]
   end
 
   # SAML SP メタデータ

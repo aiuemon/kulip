@@ -14,6 +14,13 @@ module Admin
         param_key: :auth_settings,
         permitted: %i[local_auth_enabled local_auth_show_on_login self_signup_enabled]
       },
+      passkey: {
+        form_class: Forms::PasskeySettingsForm,
+        message: "パスキー設定を更新しました。",
+        anchor: "collapseAuth",
+        param_key: :passkey_settings,
+        permitted: %i[enabled]
+      },
       ocr: {
         form_class: Forms::OcrSettingsForm,
         message: "OCR設定を更新しました。",

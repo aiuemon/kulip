@@ -4,6 +4,7 @@ class SetupControllerTest < ActionDispatch::IntegrationTest
   def clear_all_users
     Image.delete_all
     ImageGroup.delete_all
+    WebauthnCredential.delete_all
     User.delete_all
   end
 
