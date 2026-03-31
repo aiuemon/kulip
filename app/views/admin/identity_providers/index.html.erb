@@ -9,9 +9,25 @@
 <%# SAML SP メタデータ %>
 <div class="card mb-4">
   <div class="card-header">
-    SAML SP メタデータ
+    SAML SP 設定
   </div>
   <div class="card-body">
+    <%= form_with url: update_saml_sp_entity_id_admin_identity_providers_path, method: :patch, local: true, class: "mb-4" do %>
+      <div class="mb-3">
+        <label for="saml_sp_entity_id" class="form-label">SP エンティティ ID</label>
+        <div class="input-group">
+          <input type="text" class="form-control" name="saml_sp_entity_id" id="saml_sp_entity_id"
+                 value="<%= Setting.saml_sp_entity_id.presence || 'kulip' %>"
+                 placeholder="kulip">
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+        <div class="form-text">IdP に登録する SP のエンティティ ID（識別子）を設定します</div>
+      </div>
+    <% end %>
+
+    <hr>
+
+    <h6 class="text-muted mb-3">SP メタデータ</h6>
     <p class="card-text text-muted">IdP に本システムを SP として登録する際に、このメタデータ URL または XML ファイルを使用してください。</p>
     <div class="mb-3">
       <label class="form-label">メタデータ URL</label>

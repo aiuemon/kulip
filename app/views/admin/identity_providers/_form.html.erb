@@ -100,13 +100,6 @@
           id: "settings_idp_cert", rows: 10, class: "form-control font-monospace" %>
     </div>
 
-    <div class="mb-3">
-      <%= label_tag "settings_sp_entity_id", "SP エンティティ ID", class: "form-label" %>
-      <%= text_field_tag "identity_provider[settings][sp_entity_id]",
-          @identity_provider.settings&.dig("sp_entity_id") || "kulip",
-          id: "settings_sp_entity_id", class: "form-control" %>
-    </div>
-
   <% elsif @identity_provider.provider_type == "oidc" %>
     <div class="mb-3">
       <%= label_tag "settings_issuer", "Issuer URL", class: "form-label" %>

@@ -78,6 +78,9 @@ class Setting < RailsSettings::Base
   # === タイムゾーン設定 ===
   field :timezone, type: :string, default: "Asia/Tokyo"
 
+  # === SAML SP 設定 ===
+  field :saml_sp_entity_id, type: :string, default: ""
+
   # === 互換性メソッド ===
   class << self
     # 認証設定
@@ -185,6 +188,11 @@ class Setting < RailsSettings::Base
     def effective_timezone
       tz = timezone
       tz.present? ? tz : DEFAULT_TIMEZONE
+    end
+
+    # SAML SP 設定
+    def effective_saml_sp_entity_id(fallback = nil)
+      saml_sp_entity_id.presence || fallback || "kulip"
     end
   end
 end

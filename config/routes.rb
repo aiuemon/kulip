@@ -32,6 +32,7 @@ Rails.application.routes.draw do
       collection do
         post :restart_app
         post :parse_saml_metadata
+        patch :update_saml_sp_entity_id
       end
     end
     resource :settings, only: [ :show ] do
