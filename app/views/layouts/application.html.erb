@@ -65,6 +65,12 @@
                   <%= current_user.name.presence || current_user.email %>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
+                  <% if Setting.passkey_enabled? %>
+                    <li>
+                      <%= link_to "パスキー管理", passkeys_credentials_path, class: "dropdown-item" %>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                  <% end %>
                   <li>
                     <%= link_to "ログアウト", destroy_user_session_path, data: { turbo_method: :delete }, class: "dropdown-item" %>
                   </li>

@@ -387,5 +387,40 @@ module Admin
 
       assert_redirected_to root_path
     end
+
+    # Passkey settings tests
+    test "update_passkey enables passkey" do
+      sign_in @admin
+      Setting.passkey_enabled = false
+
+      patch update_passkey_admin_settings_path, params: {
+        passkey_settings: { enabled: true }
+      }
+
+      assert_redirected_to admin_settings_path(anchor: "collapseAuth")
+      assert Setting.passkey_enabled?
+    end
+
+    test "update_passkey disables passkey" do
+      sign_in @admin
+      Setting.passkey_enabled = true
+
+      patch update_passkey_admin_settings_path, params: {
+        passkey_settings: { enabled: false }
+      }
+
+      assert_redirected_to admin_settings_path(anchor: "collapseAuth")
+      assert_not Setting.passkey_enabled?
+    end
+
+    test "update_passkey requires admin" do
+      sign_in @user
+
+      patch update_passkey_admin_settings_path, params: {
+        passkey_settings: { enabled: true }
+      }
+
+      assert_redirected_to root_path
+    end
   end
 end

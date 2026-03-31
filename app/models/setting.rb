@@ -40,6 +40,7 @@ class Setting < RailsSettings::Base
   field :local_auth_enabled, type: :boolean, default: true
   field :local_auth_show_on_login, type: :boolean, default: true
   field :self_signup_enabled, type: :boolean, default: false
+  field :passkey_enabled, type: :boolean, default: false
 
   # === OCR設定 ===
   field :ocr_endpoint, type: :string, default: ""
@@ -90,6 +91,10 @@ class Setting < RailsSettings::Base
 
     def self_signup_enabled?
       self_signup_enabled
+    end
+
+    def passkey_enabled?
+      passkey_enabled
     end
 
     # OCR設定

@@ -28,6 +28,7 @@ gem "omniauth"
 gem "omniauth-rails_csrf_protection"
 gem "omniauth-saml"
 gem "omniauth_openid_connect"
+gem "webauthn"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
