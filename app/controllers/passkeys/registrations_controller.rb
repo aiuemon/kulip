@@ -1,5 +1,6 @@
 module Passkeys
   class RegistrationsController < ApplicationController
+    skip_before_action :verify_authenticity_token, only: %i[create]
     before_action :ensure_passkey_enabled
 
     # GET /passkeys/registrations/new
