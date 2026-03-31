@@ -5,6 +5,24 @@
         <h2 class="mb-0">ログイン</h2>
       </div>
       <div class="card-body">
+
+        <% if Setting.passkey_enabled? && WebauthnCredential.exists? %>
+          <div data-controller="passkey-login">
+            <h5 class="card-title">パスキーでログイン</h5>
+            <div class="d-grid">
+              <button type="button" class="btn btn-outline-primary"
+                      data-action="click->passkey-login#login"
+                      data-passkey-login-target="button">
+                パスキーでログイン
+              </button>
+            </div>
+            <div class="d-none mt-3" data-passkey-login-target="result">
+              <div class="alert mb-0" data-passkey-login-target="message"></div>
+            </div>
+          </div>
+          <hr>
+        <% end %>
+
         <% if Setting.local_auth_enabled? && Setting.local_auth_show_on_login? %>
           <h5 class="card-title">メールアドレスでログイン</h5>
           <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
@@ -54,25 +72,6 @@
           </div>
         <% end %>
 
-        <% if Setting.passkey_enabled? && WebauthnCredential.exists? %>
-          <% has_other_methods = (Setting.local_auth_enabled? && Setting.local_auth_show_on_login?) || visible_idps.any? %>
-          <% if has_other_methods %>
-            <hr>
-          <% end %>
-          <div data-controller="passkey-login">
-            <h5 class="card-title">パスキーでログイン</h5>
-            <div class="d-grid">
-              <button type="button" class="btn btn-outline-primary"
-                      data-action="click->passkey-login#login"
-                      data-passkey-login-target="button">
-                パスキーでログイン
-              </button>
-            </div>
-            <div class="d-none mt-3" data-passkey-login-target="result">
-              <div class="alert mb-0" data-passkey-login-target="message"></div>
-            </div>
-          </div>
-        <% end %>
 
         <% unless Setting.local_auth_show_on_login? || visible_idps.any? || (Setting.passkey_enabled? && WebauthnCredential.exists?) %>
           <div class="alert alert-warning">
