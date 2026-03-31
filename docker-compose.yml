@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/aiuemon/kulip:0.1.27
+    image: ghcr.io/aiuemon/kulip:0.1.28
     ports:
       - "3000:80"
     env_file:
