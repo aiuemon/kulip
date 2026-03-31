@@ -1,7 +1,7 @@
 module Admin
   class IdentityProvidersController < BaseController
     # プロバイダータイプごとの許可される settings キー
-    SAML_SETTINGS_KEYS = %w[idp_sso_url idp_slo_url idp_cert sp_entity_id].freeze
+    SAML_SETTINGS_KEYS = %w[idp_sso_url idp_slo_url idp_cert].freeze
     OIDC_SETTINGS_KEYS = %w[issuer client_id client_secret redirect_uri].freeze
 
     before_action :set_identity_provider, only: %i[show edit update destroy]
@@ -80,6 +80,12 @@ module Admin
 
       redirect_to admin_identity_providers_path,
         notice: "アプリを再起動中です。3秒後に自動でリロードします。"
+    end
+
+    def update_saml_sp_entity_id
+      Setting.saml_sp_entity_id = params[:saml_sp_entity_id].to_s.strip
+      redirect_to admin_identity_providers_path,
+        notice: "SP エンティティ ID を更新しました。設定を反映するにはアプリを再起動してください。"
     end
 
     private

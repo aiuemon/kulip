@@ -27,9 +27,7 @@ class SamlMetadataController < ApplicationController
   end
 
   def sp_entity_id
-    # 登録済み SAML IdP の sp_entity_id を取得、なければデフォルト
-    saml_idp = IdentityProvider.where(provider_type: "saml").first
-    saml_idp&.settings&.dig("sp_entity_id").presence || request.base_url
+    Setting.effective_saml_sp_entity_id(request.base_url)
   end
 
   def assertion_consumer_service_url

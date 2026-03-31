@@ -281,6 +281,17 @@ Devise.setup do |config|
     connection = ActiveRecord::Base.connection
     if connection.table_exists?("identity_providers")
       # モデルを使わず直接SQLで読み込む（初期化時のロード順序問題を回避）
+
+      # SP EntityID を settings テーブルから取得
+      sp_entity_id = "kulip"
+      if connection.table_exists?("settings")
+        result = connection.execute("SELECT value FROM settings WHERE var = 'saml_sp_entity_id' LIMIT 1")
+        if result.any?
+          stored_value = result.first["value"]
+          sp_entity_id = stored_value if stored_value.present?
+        end
+      end
+
       rows = connection.execute("SELECT slug, provider_type, settings FROM identity_providers WHERE enabled = TRUE")
       rows.each do |row|
         slug = row["slug"]
@@ -295,7 +306,7 @@ Devise.setup do |config|
             idp_slo_service_url: settings["idp_slo_url"],
             idp_sso_service_binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
             idp_cert: settings["idp_cert"],
-            sp_entity_id: settings["sp_entity_id"] || "kulip",
+            sp_entity_id: sp_entity_id,
             name_identifier_format: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
             attribute_statements: {
               email: [ "email", "mail", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" ]
