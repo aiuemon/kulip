@@ -13,21 +13,15 @@
       <span class="badge bg-success">完了: <%= @image_group.completed_count %> 件</span>
       <span class="ms-2"><%= @image_group.status_summary %></span>
     </p>
+    <% all_completed = @image_group.completed_count == @image_group.images_count && @image_group.images_count > 0 %>
+    <% if all_completed %>
+      <%= link_to "一括ダウンロード (ZIP)", download_image_group_path(@image_group, format: "txt"), class: "btn btn-success" %>
+    <% else %>
+      <button type="button" class="btn btn-success" disabled>一括ダウンロード (ZIP)</button>
+      <small class="text-muted ms-2">全ての画像の処理が完了すると有効になります</small>
+    <% end %>
   </div>
 </div>
-
-<% if @image_group.completed_count > 0 %>
-  <div class="card mb-4">
-    <div class="card-header">
-      一括ダウンロード
-    </div>
-    <div class="card-body">
-      <p class="card-text">完了した <%= @image_group.completed_count %> 件の結果をダウンロード:</p>
-      <%= link_to "テキスト形式 (ZIP)", download_image_group_path(@image_group, format: "txt"), class: "btn btn-success" %>
-      <%= link_to "Markdown 形式 (ZIP)", download_image_group_path(@image_group, format: "md"), class: "btn btn-outline-success" %>
-    </div>
-  </div>
-<% end %>
 
 <h2 class="mb-3">画像一覧</h2>
 
