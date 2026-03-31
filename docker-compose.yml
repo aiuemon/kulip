@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/aiuemon/kulip:0.1.19
+    image: ghcr.io/aiuemon/kulip:0.1.22
     ports:
       - "3000:80"
     env_file:
@@ -9,6 +9,7 @@ services:
       DATABASE_URL: postgres://kulip:kulip@db:5432/kulip_production
       HTTP_MAX_REQUEST_BODY: "100000000"  # 100MB
       # RAILS_LOG_LEVEL: debug  # デバッグメッセージを表示する場合はコメント解除
+      # WEBAUTHN_ORIGIN: https://example.com  # パスキー認証を使用する場合は本番URLを設定
     depends_on:
       db:
         condition: service_healthy
