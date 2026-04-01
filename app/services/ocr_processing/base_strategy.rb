@@ -12,7 +12,7 @@ module OcrProcessing
     # メインの処理メソッド
     # サブクラスは execute_ocr を実装する
     def process
-      image.update!(status: "processing")
+      image.update!(status: "queued")
       start_time = Time.current
 
       result = execute_ocr
@@ -31,6 +31,11 @@ module OcrProcessing
     # @return [String] OCR 結果
     def execute_ocr
       raise NotImplementedError, "#{self.class} must implement #execute_ocr"
+    end
+
+    # API 呼び出し前にステータスを processing に更新
+    def mark_processing!
+      image.update!(status: "processing")
     end
 
     def complete_processing(result, duration)

@@ -17,7 +17,7 @@ class OcrProcessJob < ApplicationJob
   private
 
   def processable?(image)
-    image && image.pending? && image.file.attached?
+    image && (image.pending? || image.queued?) && image.file.attached?
   end
 
   def select_strategy(image)

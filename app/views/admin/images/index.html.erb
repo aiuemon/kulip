@@ -25,6 +25,8 @@
             <% case image.status %>
             <% when "pending" %>
               <span class="badge bg-secondary">待機中</span>
+            <% when "queued" %>
+              <span class="badge bg-info">処理待ち</span>
             <% when "processing" %>
               <span class="badge bg-primary">処理中</span>
             <% when "completed" %>

@@ -6,6 +6,7 @@ module OcrProcessing
 
     def execute_ocr
       page_images = convert_pdf_to_images
+      mark_processing!
       results = process_pages(page_images)
       combine_results(results)
     end

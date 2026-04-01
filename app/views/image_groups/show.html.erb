@@ -60,6 +60,8 @@
                 <% case image.status %>
                 <% when "pending" %>
                   <span class="badge bg-secondary">待機中</span>
+                <% when "queued" %>
+                  <span class="badge bg-info">処理待ち</span>
                 <% when "processing" %>
                   <span class="badge bg-primary">処理中</span>
                 <% when "completed" %>
@@ -75,7 +77,7 @@
                 <% if image.completed? && image.ocr_result.present? %>
                   <%= link_to "DL", download_image_path(image, format: "txt"), class: "btn btn-sm btn-outline-success", title: "ダウンロード" %>
                 <% end %>
-                <% if image.failed? || image.pending? %>
+                <% if image.failed? || image.pending? || image.queued? %>
                   <%= link_to "再実行", retry_image_path(image), class: "btn btn-sm btn-outline-warning", data: { turbo_method: :post } %>
                 <% end %>
               <% end %>

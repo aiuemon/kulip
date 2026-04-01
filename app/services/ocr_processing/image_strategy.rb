@@ -5,6 +5,7 @@ module OcrProcessing
 
     def execute_ocr
       image_data, filename, content_type = prepare_image_data
+      mark_processing!
       client.transcribe(
         image_data: image_data,
         filename: filename,
