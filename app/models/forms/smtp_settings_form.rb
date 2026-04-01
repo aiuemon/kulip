@@ -12,6 +12,7 @@ module Forms
     attribute :user_name, :string
     attribute :password, :string
     attribute :enable_starttls, :boolean
+    attribute :openssl_verify_none, :boolean
     attribute :from_address, :string
 
     validates :address, presence: true, if: :enabled
@@ -34,6 +35,7 @@ module Forms
       Setting.smtp_user_name = user_name.presence || ""
       Setting.smtp_password = password.presence || "" if password.present? || !enabled
       Setting.smtp_enable_starttls = enable_starttls.nil? ? true : enable_starttls
+      Setting.smtp_openssl_verify_none = openssl_verify_none || false
       Setting.smtp_from_address = from_address.presence || ""
       true
     rescue => e
@@ -66,6 +68,7 @@ module Forms
       self.authentication = Setting.smtp_authentication.presence || "plain"
       self.user_name = Setting.smtp_user_name
       self.enable_starttls = Setting.smtp_enable_starttls
+      self.openssl_verify_none = Setting.smtp_openssl_verify_none
       self.from_address = Setting.smtp_from_address
     end
   end

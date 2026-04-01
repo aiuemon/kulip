@@ -207,6 +207,12 @@
             <%= f.label :enable_starttls, "STARTTLS を使用する", class: "form-check-label" %>
           </div>
 
+          <div class="form-check mb-3">
+            <%= f.check_box :openssl_verify_none, class: "form-check-input" %>
+            <%= f.label :openssl_verify_none, "サーバ証明書の検証を行わない", class: "form-check-label" %>
+            <div class="form-text text-warning">自己署名証明書を使用する場合など、証明書の検証をスキップします。セキュリティ上のリスクがあります。</div>
+          </div>
+
           <h6 class="text-muted mt-4 mb-3">認証設定</h6>
           <div class="mb-3">
             <%= f.label :authentication, "認証方式", class: "form-label" %>
