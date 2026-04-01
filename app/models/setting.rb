@@ -73,6 +73,7 @@ class Setting < RailsSettings::Base
   field :smtp_user_name, type: :string, default: ""
   field :smtp_password, type: :string, default: ""
   field :smtp_enable_starttls, type: :boolean, default: true
+  field :smtp_openssl_verify_none, type: :boolean, default: false
   field :smtp_from_address, type: :string, default: ""
 
   # === タイムゾーン設定 ===
@@ -179,6 +180,10 @@ class Setting < RailsSettings::Base
         settings[:authentication] = smtp_authentication.to_sym
         settings[:user_name] = smtp_user_name if smtp_user_name.present?
         settings[:password] = smtp_password if smtp_password.present?
+      end
+
+      if smtp_openssl_verify_none
+        settings[:openssl_verify_mode] = OpenSSL::SSL::VERIFY_NONE
       end
 
       settings
