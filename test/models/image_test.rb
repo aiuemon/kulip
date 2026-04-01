@@ -2,12 +2,23 @@ require "test_helper"
 
 class ImageTest < ActiveSupport::TestCase
   test "valid statuses" do
-    assert_equal %w[pending processing completed failed], Image::STATUSES
+    assert_equal %w[pending queued processing completed failed], Image::STATUSES
   end
 
   test "pending? returns true for pending status" do
     image = images(:pending_image)
     assert image.pending?
+    assert_not image.queued?
+    assert_not image.processing?
+    assert_not image.completed?
+    assert_not image.failed?
+  end
+
+  test "queued? returns true for queued status" do
+    image = images(:pending_image)
+    image.status = "queued"
+    assert image.queued?
+    assert_not image.pending?
     assert_not image.processing?
     assert_not image.completed?
     assert_not image.failed?
@@ -17,6 +28,7 @@ class ImageTest < ActiveSupport::TestCase
     image = images(:processing_image)
     assert image.processing?
     assert_not image.pending?
+    assert_not image.queued?
     assert_not image.completed?
     assert_not image.failed?
   end
@@ -25,6 +37,7 @@ class ImageTest < ActiveSupport::TestCase
     image = images(:completed_image)
     assert image.completed?
     assert_not image.pending?
+    assert_not image.queued?
     assert_not image.processing?
     assert_not image.failed?
   end
@@ -33,6 +46,7 @@ class ImageTest < ActiveSupport::TestCase
     image = images(:failed_image)
     assert image.failed?
     assert_not image.pending?
+    assert_not image.queued?
     assert_not image.processing?
     assert_not image.completed?
   end
@@ -171,6 +185,12 @@ class ImageTest < ActiveSupport::TestCase
 
   test "retryable? returns true for pending images" do
     image = images(:pending_image)
+    assert image.retryable?
+  end
+
+  test "retryable? returns true for queued images" do
+    image = images(:pending_image)
+    image.status = "queued"
     assert image.retryable?
   end
 

@@ -1,5 +1,5 @@
 class Image < ApplicationRecord
-  STATUSES = %w[pending processing completed failed].freeze
+  STATUSES = %w[pending queued processing completed failed].freeze
 
   belongs_to :user
   belongs_to :image_group, optional: true
@@ -26,6 +26,10 @@ class Image < ApplicationRecord
     status == "pending"
   end
 
+  def queued?
+    status == "queued"
+  end
+
   def processing?
     status == "processing"
   end
@@ -49,7 +53,7 @@ class Image < ApplicationRecord
 
   # 再試行が可能かどうか
   def retryable?
-    !purged? && (failed? || pending? || ocr_result_missing?)
+    !purged? && (failed? || pending? || queued? || ocr_result_missing?)
   end
 
   # ファイルを削除（論理削除）
