@@ -61,7 +61,7 @@ module Admin
         message: "送信メールサーバ設定を更新しました。",
         anchor: "collapseSmtp",
         param_key: :smtp_settings,
-        permitted: %i[enabled address port authentication user_name password enable_starttls from_address]
+        permitted: %i[enabled address port authentication user_name password enable_starttls openssl_verify_none from_address]
       },
       timezone: {
         form_class: Forms::TimezoneSettingsForm,
@@ -153,6 +153,11 @@ module Admin
         settings[:user_name] = smtp_params[:user_name].presence
         # パスワードが入力されていればそれを使用、なければ保存済みのパスワードを使用
         settings[:password] = smtp_params[:password].presence || Setting.smtp_password.presence
+      end
+
+      # サーバ証明書の検証をスキップ
+      if smtp_params[:openssl_verify_none] == "true" || smtp_params[:openssl_verify_none] == "1"
+        settings[:openssl_verify_mode] = OpenSSL::SSL::VERIFY_NONE
       end
 
       settings.compact
