@@ -80,4 +80,44 @@ class UserTest < ActiveSupport::TestCase
     assert_kind_of Numeric, user.available_storage_mb
     assert user.available_storage_mb >= 0
   end
+
+  test "timeout_in returns session timeout from settings" do
+    user = users(:user)
+    Setting.session_timeout_hours = 12
+    assert_equal 12.hours, user.timeout_in
+  end
+
+  test "invalidate_all_sessions! sets sessions_invalidated_at" do
+    user = users(:user)
+    assert_nil user.sessions_invalidated_at
+
+    user.invalidate_all_sessions!
+    assert_not_nil user.sessions_invalidated_at
+  end
+
+  test "session_valid? returns true when sessions_invalidated_at is nil" do
+    user = users(:user)
+    user.sessions_invalidated_at = nil
+    assert user.session_valid?(Time.current.to_i)
+  end
+
+  test "session_valid? returns false when signed_in_at is nil and sessions_invalidated_at is set" do
+    user = users(:user)
+    user.sessions_invalidated_at = Time.current
+    assert_not user.session_valid?(nil)
+  end
+
+  test "session_valid? returns true when signed_in after invalidation" do
+    user = users(:user)
+    user.sessions_invalidated_at = 1.hour.ago
+    signed_in_at = Time.current.to_i
+    assert user.session_valid?(signed_in_at)
+  end
+
+  test "session_valid? returns false when signed_in before invalidation" do
+    user = users(:user)
+    signed_in_at = 2.hours.ago.to_i
+    user.sessions_invalidated_at = 1.hour.ago
+    assert_not user.session_valid?(signed_in_at)
+  end
 end

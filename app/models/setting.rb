@@ -41,6 +41,7 @@ class Setting < RailsSettings::Base
   field :local_auth_show_on_login, type: :boolean, default: true
   field :self_signup_enabled, type: :boolean, default: false
   field :passkey_enabled, type: :boolean, default: false
+  field :session_timeout_hours, type: :integer, default: 24
 
   # === OCR設定 ===
   field :ocr_endpoint, type: :string, default: ""
@@ -99,6 +100,11 @@ class Setting < RailsSettings::Base
 
     def passkey_enabled?
       passkey_enabled
+    end
+
+    def effective_session_timeout
+      hours = session_timeout_hours
+      hours.present? && hours > 0 ? hours.hours : 24.hours
     end
 
     # OCR設定

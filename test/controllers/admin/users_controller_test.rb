@@ -67,5 +67,35 @@ module Admin
       @admin.reload
       assert @admin.admin?
     end
+
+    test "invalidate_sessions invalidates user sessions" do
+      sign_in @admin
+      assert_nil @user.sessions_invalidated_at
+
+      patch invalidate_sessions_admin_user_path(@user)
+      assert_redirected_to admin_users_path
+      assert_match /セッションを無効化しました/, flash[:notice]
+
+      @user.reload
+      assert_not_nil @user.sessions_invalidated_at
+    end
+
+    test "invalidate_sessions cannot invalidate own sessions" do
+      sign_in @admin
+
+      patch invalidate_sessions_admin_user_path(@admin)
+      assert_redirected_to admin_users_path
+      assert_equal "自分自身のセッションは無効化できません。", flash[:alert]
+
+      @admin.reload
+      assert_nil @admin.sessions_invalidated_at
+    end
+
+    test "invalidate_sessions requires admin role" do
+      sign_in @user
+
+      patch invalidate_sessions_admin_user_path(@admin)
+      assert_redirected_to root_path
+    end
   end
 end

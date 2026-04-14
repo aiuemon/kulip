@@ -50,6 +50,7 @@ Rails.application.routes.draw do
     resources :users, only: %i[index] do
       member do
         patch :toggle_admin
+        patch :invalidate_sessions
       end
     end
     resources :images, only: %i[index destroy]

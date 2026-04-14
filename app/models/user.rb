@@ -1,9 +1,14 @@
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable, :trackable
+  # :confirmable, :lockable, :trackable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
-         :omniauthable
+         :omniauthable, :timeoutable
+
+  # Devise timeoutable の設定を動的に取得
+  def timeout_in
+    Setting.effective_session_timeout
+  end
 
   has_many :images, dependent: :destroy
   has_many :image_groups, dependent: :destroy
@@ -20,6 +25,21 @@ class User < ApplicationRecord
 
   def passkey_registered?
     webauthn_credentials.exists?
+  end
+
+  # 全セッションを無効化
+  def invalidate_all_sessions!
+    update!(sessions_invalidated_at: Time.current)
+  end
+
+  # セッションが有効かどうか（ログイン時刻が無効化時刻より後）
+  def session_valid?(signed_in_at)
+    return true if sessions_invalidated_at.nil?
+    return false if signed_in_at.nil?
+
+    # signed_in_at は Unix timestamp (Integer) で保存されている
+    signed_in_time = Time.zone.at(signed_in_at)
+    signed_in_time > sessions_invalidated_at
   end
 
   # ストレージ使用量（バイト）

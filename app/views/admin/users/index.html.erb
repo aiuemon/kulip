@@ -41,6 +41,13 @@
                             turbo_method: :patch,
                             turbo_confirm: "#{user.email} の管理者権限を#{user.admin? ? '解除' : '付与'}しますか？"
                           }) %>
+              <%= link_to "セッション無効化",
+                          invalidate_sessions_admin_user_path(user),
+                          class: "btn btn-sm btn-outline-danger ms-1",
+                          data: {
+                            turbo_method: :patch,
+                            turbo_confirm: "#{user.email} のセッションを無効化しますか？\nこのユーザは次回アクセス時に再ログインが必要になります。"
+                          } %>
             <% else %>
               <span class="badge bg-secondary">自分</span>
             <% end %>

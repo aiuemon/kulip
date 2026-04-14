@@ -40,6 +40,12 @@
             <%= f.label :self_signup_enabled, "新規登録を許可する", class: "form-check-label" %>
           </div>
 
+          <div class="mb-3">
+            <%= f.label :session_timeout_hours, "セッションタイムアウト（時間）", class: "form-label" %>
+            <%= f.number_field :session_timeout_hours, class: "form-control", min: 1, style: "max-width: 150px;" %>
+            <div class="form-text">ログイン後、指定時間が経過するとログアウト状態になります。デフォルト: 24時間</div>
+          </div>
+
           <div class="d-grid gap-2 d-md-flex justify-content-md-end">
             <%= f.submit "保存", class: "btn btn-primary" %>
           </div>
