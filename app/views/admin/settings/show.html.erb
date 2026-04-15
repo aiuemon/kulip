@@ -40,10 +40,33 @@
             <%= f.label :self_signup_enabled, "新規登録を許可する", class: "form-check-label" %>
           </div>
 
+          <h6 class="text-muted mt-4 mb-3">セッションタイムアウト</h6>
           <div class="mb-3">
-            <%= f.label :session_timeout_hours, "セッションタイムアウト（時間）", class: "form-label" %>
+            <%= f.label :session_timeout_hours, "デフォルト（時間）", class: "form-label" %>
             <%= f.number_field :session_timeout_hours, class: "form-control", min: 1, style: "max-width: 150px;" %>
-            <div class="form-text">ログイン後、指定時間が経過するとログアウト状態になります。デフォルト: 24時間</div>
+            <div class="form-text">認証方式ごとの設定がない場合に使用されます。デフォルト: 24時間</div>
+          </div>
+
+          <p class="text-muted small mb-3">認証方式ごとにセッションタイムアウト時間を設定できます。空欄の場合はデフォルト値が使用されます。</p>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <%= f.label :session_timeout_local_hours, "ローカル認証（時間）", class: "form-label" %>
+              <%= f.number_field :session_timeout_local_hours, class: "form-control", min: 1, style: "max-width: 150px;", placeholder: "デフォルト" %>
+            </div>
+            <div class="col-md-6 mb-3">
+              <%= f.label :session_timeout_passkey_hours, "パスキー（時間）", class: "form-label" %>
+              <%= f.number_field :session_timeout_passkey_hours, class: "form-control", min: 1, style: "max-width: 150px;", placeholder: "デフォルト" %>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <%= f.label :session_timeout_saml_hours, "SAML（時間）", class: "form-label" %>
+              <%= f.number_field :session_timeout_saml_hours, class: "form-control", min: 1, style: "max-width: 150px;", placeholder: "デフォルト" %>
+            </div>
+            <div class="col-md-6 mb-3">
+              <%= f.label :session_timeout_oidc_hours, "OIDC（時間）", class: "form-label" %>
+              <%= f.number_field :session_timeout_oidc_hours, class: "form-control", min: 1, style: "max-width: 150px;", placeholder: "デフォルト" %>
+            </div>
           </div>
 
           <div class="d-grid gap-2 d-md-flex justify-content-md-end">

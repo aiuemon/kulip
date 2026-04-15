@@ -59,4 +59,35 @@ class SettingTest < ActiveSupport::TestCase
     Setting.max_storage_per_user_mb = 100
     assert_equal 100.megabytes, Setting.max_storage_bytes
   end
+
+  test "timeout_for_auth_method returns specific timeout when set" do
+    Setting.session_timeout_hours = 24
+    Setting.session_timeout_local_hours = 12
+    assert_equal 12.hours, Setting.timeout_for_auth_method("local")
+  end
+
+  test "timeout_for_auth_method returns default timeout when not set" do
+    Setting.session_timeout_hours = 24
+    Setting.session_timeout_local_hours = nil
+    assert_equal 24.hours, Setting.timeout_for_auth_method("local")
+  end
+
+  test "timeout_for_auth_method supports all auth methods" do
+    Setting.session_timeout_hours = 24
+    Setting.session_timeout_local_hours = 1
+    Setting.session_timeout_saml_hours = 2
+    Setting.session_timeout_oidc_hours = 3
+    Setting.session_timeout_passkey_hours = 4
+
+    assert_equal 1.hours, Setting.timeout_for_auth_method("local")
+    assert_equal 2.hours, Setting.timeout_for_auth_method("saml")
+    assert_equal 3.hours, Setting.timeout_for_auth_method("oidc")
+    assert_equal 4.hours, Setting.timeout_for_auth_method("passkey")
+  end
+
+  test "timeout_for_auth_method returns default for unknown auth method" do
+    Setting.session_timeout_hours = 24
+    assert_equal 24.hours, Setting.timeout_for_auth_method("unknown")
+    assert_equal 24.hours, Setting.timeout_for_auth_method(nil)
+  end
 end

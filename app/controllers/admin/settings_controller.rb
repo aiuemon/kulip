@@ -12,7 +12,7 @@ module Admin
         message: "認証設定を更新しました。",
         anchor: "collapseAuth",
         param_key: :auth_settings,
-        permitted: %i[local_auth_enabled local_auth_show_on_login self_signup_enabled session_timeout_hours]
+        permitted: %i[local_auth_enabled local_auth_show_on_login self_signup_enabled session_timeout_hours session_timeout_local_hours session_timeout_saml_hours session_timeout_oidc_hours session_timeout_passkey_hours]
       },
       passkey: {
         form_class: Forms::PasskeySettingsForm,

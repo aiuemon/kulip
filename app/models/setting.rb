@@ -42,6 +42,10 @@ class Setting < RailsSettings::Base
   field :self_signup_enabled, type: :boolean, default: false
   field :passkey_enabled, type: :boolean, default: false
   field :session_timeout_hours, type: :integer, default: 24
+  field :session_timeout_local_hours, type: :integer, default: nil
+  field :session_timeout_saml_hours, type: :integer, default: nil
+  field :session_timeout_oidc_hours, type: :integer, default: nil
+  field :session_timeout_passkey_hours, type: :integer, default: nil
 
   # === OCR設定 ===
   field :ocr_endpoint, type: :string, default: ""
@@ -105,6 +109,25 @@ class Setting < RailsSettings::Base
     def effective_session_timeout
       hours = session_timeout_hours
       hours.present? && hours > 0 ? hours.hours : 24.hours
+    end
+
+    def timeout_for_auth_method(auth_method)
+      hours = case auth_method&.to_s
+      when "local"
+        session_timeout_local_hours
+      when "saml"
+        session_timeout_saml_hours
+      when "oidc"
+        session_timeout_oidc_hours
+      when "passkey"
+        session_timeout_passkey_hours
+      end
+
+      if hours.present? && hours > 0
+        hours.hours
+      else
+        effective_session_timeout
+      end
     end
 
     # OCR設定

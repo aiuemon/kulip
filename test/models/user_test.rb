@@ -81,12 +81,6 @@ class UserTest < ActiveSupport::TestCase
     assert user.available_storage_mb >= 0
   end
 
-  test "timeout_in returns session timeout from settings" do
-    user = users(:user)
-    Setting.session_timeout_hours = 12
-    assert_equal 12.hours, user.timeout_in
-  end
-
   test "invalidate_all_sessions! sets sessions_invalidated_at" do
     user = users(:user)
     assert_nil user.sessions_invalidated_at

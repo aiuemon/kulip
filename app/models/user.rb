@@ -1,14 +1,10 @@
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :trackable
+  # Note: timeoutable は warden_hooks.rb で認証方式別に自前実装
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
-         :omniauthable, :timeoutable
-
-  # Devise timeoutable の設定を動的に取得
-  def timeout_in
-    Setting.effective_session_timeout
-  end
+         :omniauthable
 
   has_many :images, dependent: :destroy
   has_many :image_groups, dependent: :destroy

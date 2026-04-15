@@ -33,7 +33,12 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       idp = IdentityProvider.find_by(slug: idp_slug)
       display_name = idp&.name || provider_name.upcase
 
+      # 認証方式を判別（saml_ または oidc_ プレフィックスから）
+      auth_method = provider_name.start_with?("saml_") ? "saml" : "oidc"
+
       sign_in_and_redirect @user, event: :authentication
+      # セッションに認証方式を記録
+      warden.session(:user)["auth_method"] = auth_method
       set_flash_message(:notice, :success, kind: display_name) if is_navigational_format?
     else
       redirect_to root_path, alert: "認証に失敗しました。"

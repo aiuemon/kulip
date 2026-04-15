@@ -35,6 +35,8 @@ module Passkeys
 
       # Devise でログイン
       sign_in(stored_credential.user)
+      # セッションに認証方式を記録
+      warden.session(:user)["auth_method"] = "passkey"
 
       render json: { success: true, redirect_url: root_path }
     rescue ::WebAuthn::Error => e
