@@ -49,12 +49,17 @@ class ImageGroupsController < ApplicationController
 
     @image_group = current_user.image_groups.build(memo: params[:memo].presence)
 
+    # プロンプトパターンを取得
+    prompt_pattern = find_ocr_prompt_pattern
+
     if @image_group.save
       uploaded_files.each do |file|
         @image_group.images.create(
           user: current_user,
           name: file.original_filename,
-          file: file
+          file: file,
+          ocr_prompt_pattern: prompt_pattern,
+          ocr_prompt_text: prompt_pattern&.prompt
         )
       end
 
@@ -89,6 +94,12 @@ class ImageGroupsController < ApplicationController
 
   def set_image_group
     @image_group = current_user.image_groups.find(params[:id])
+  end
+
+  def find_ocr_prompt_pattern
+    return nil unless params[:ocr_prompt_pattern_id].present?
+
+    OcrPromptPattern.find_by(id: params[:ocr_prompt_pattern_id])
   end
 
   def validate_pdf_pages(files)

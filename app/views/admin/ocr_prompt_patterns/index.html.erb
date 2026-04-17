@@ -1,0 +1,62 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>OCR プロンプトパターン</h1>
+  <%= link_to "新規作成", new_admin_ocr_prompt_pattern_path, class: "btn btn-primary" %>
+</div>
+
+<% if @ocr_prompt_patterns.any? %>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th style="width: 50px;">順序</th>
+          <th>名前</th>
+          <th>プロンプト</th>
+          <th style="width: 100px;">デフォルト</th>
+          <th style="width: 200px;">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @ocr_prompt_patterns.each do |pattern| %>
+          <tr>
+            <td><%= pattern.position %></td>
+            <td><%= pattern.name %></td>
+            <td>
+              <span class="text-muted small" title="<%= pattern.prompt %>">
+                <%= truncate(pattern.prompt, length: 80) %>
+              </span>
+            </td>
+            <td>
+              <% if pattern.is_default? %>
+                <span class="badge bg-primary">デフォルト</span>
+              <% else %>
+                <%= link_to "設定",
+                    set_default_admin_ocr_prompt_pattern_path(pattern),
+                    method: :patch,
+                    class: "btn btn-sm btn-outline-secondary",
+                    data: { turbo_method: :patch } %>
+              <% end %>
+            </td>
+            <td>
+              <%= link_to "編集", edit_admin_ocr_prompt_pattern_path(pattern), class: "btn btn-sm btn-outline-primary" %>
+              <%= link_to "削除", admin_ocr_prompt_pattern_path(pattern),
+                  class: "btn btn-sm btn-outline-danger ms-1",
+                  data: {
+                    turbo_method: :delete,
+                    turbo_confirm: "「#{pattern.name}」を削除しますか？"
+                  } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="alert alert-info">
+    <p class="mb-0">プロンプトパターンが登録されていません。</p>
+    <p class="mb-0 mt-2">プロンプトパターンを登録すると、利用者が画像アップロード時に選択できるようになります。</p>
+  </div>
+<% end %>
+
+<div class="mt-4">
+  <%= link_to "設定に戻る", admin_settings_path, class: "btn btn-outline-secondary" %>
+</div>

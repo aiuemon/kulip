@@ -1,0 +1,11 @@
+default_pattern:
+  name: "標準テキスト認識"
+  prompt: "この画像のテキストを文字起こししてください。"
+  position: 0
+  is_default: true
+
+detailed_pattern:
+  name: "詳細分析"
+  prompt: "この画像を詳細に分析し、テキストを抽出してください。"
+  position: 1
+  is_default: false

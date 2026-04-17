@@ -20,6 +20,22 @@
         <%= text_field_tag :memo, nil, placeholder: "任意のメモを入力できます", class: "form-control" %>
       </div>
 
+      <% if OcrPromptPattern.any? %>
+        <div class="mb-3">
+          <label for="ocr_prompt_pattern_id" class="form-label">プロンプトパターン</label>
+          <%= select_tag :ocr_prompt_pattern_id,
+              options_from_collection_for_select(
+                OcrPromptPattern.ordered,
+                :id,
+                :name,
+                OcrPromptPattern.default_or_first&.id
+              ),
+              class: "form-select",
+              style: "max-width: 400px;" %>
+          <div class="form-text">OCR 処理に使用するプロンプトを選択してください。</div>
+        </div>
+      <% end %>
+
       <div class="mb-3">
         <label for="images" class="form-label">ファイル（複数選択可）</label>
         <div class="dropzone-area p-4 border border-2 border-dashed rounded text-center">

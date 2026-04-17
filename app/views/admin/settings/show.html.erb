@@ -167,10 +167,19 @@
           </div>
 
           <h6 class="text-muted mt-4 mb-3">プロンプト設定</h6>
+          <p class="card-text mb-3">
+            登録済みパターン: <span class="badge bg-secondary"><%= OcrPromptPattern.count %> 件</span>
+          </p>
+          <%= link_to "プロンプトパターンを管理", admin_ocr_prompt_patterns_path, class: "btn btn-outline-primary btn-sm mb-3" %>
+          <div class="form-text mb-3">
+            プロンプトパターンを登録すると、利用者が画像アップロード時に選択できます。<br>
+            パターンが未登録の場合は、下記のデフォルトプロンプトが使用されます。
+          </div>
+
           <div class="mb-3">
-            <%= f.label :prompt, "プロンプト", class: "form-label" %>
+            <%= f.label :prompt, "デフォルトプロンプト", class: "form-label" %>
             <%= f.text_area :prompt, class: "form-control", rows: 6, placeholder: Setting::DEFAULT_OCR_PROMPT %>
-            <div class="form-text">空欄の場合はデフォルトのプロンプトが使用されます</div>
+            <div class="form-text">プロンプトパターンが未設定・未選択の場合に使用されます。空欄の場合は組み込みのデフォルトが使用されます。</div>
           </div>
 
           <h6 class="text-muted mt-4 mb-3">オプション設定</h6>

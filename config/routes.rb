@@ -54,6 +54,11 @@ Rails.application.routes.draw do
       end
     end
     resources :images, only: %i[index destroy]
+    resources :ocr_prompt_patterns, except: %i[show] do
+      member do
+        patch :set_default
+      end
+    end
   end
 
   # パスキー

@@ -9,7 +9,8 @@ module OcrProcessing
       client.transcribe(
         image_data: image_data,
         filename: filename,
-        content_type: content_type
+        content_type: content_type,
+        prompt: image.effective_ocr_prompt
       )
     end
 

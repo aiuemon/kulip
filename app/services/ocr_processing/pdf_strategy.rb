@@ -20,11 +20,13 @@ module OcrProcessing
     end
 
     def process_pages(page_images)
+      prompt = image.effective_ocr_prompt
       page_images.map do |page|
         page_result = client.transcribe(
           image_data: page[:image_data],
           filename: page[:filename],
-          content_type: "image/jpeg"
+          content_type: "image/jpeg",
+          prompt: prompt
         )
         format_page_result(page[:page_number], page[:filename], page_result)
       end

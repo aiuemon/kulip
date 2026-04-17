@@ -215,4 +215,31 @@ class ImageTest < ActiveSupport::TestCase
     image = images(:processing_image)
     assert_not image.retryable?
   end
+
+  # effective_ocr_prompt tests
+  test "effective_ocr_prompt returns ocr_prompt_text when present" do
+    image = images(:completed_image)
+    image.ocr_prompt_text = "カスタムプロンプト"
+    assert_equal "カスタムプロンプト", image.effective_ocr_prompt
+  end
+
+  test "effective_ocr_prompt returns pattern prompt when no ocr_prompt_text" do
+    image = images(:completed_image)
+    pattern = ocr_prompt_patterns(:default_pattern)
+    image.ocr_prompt_pattern = pattern
+    image.ocr_prompt_text = nil
+    assert_equal pattern.prompt, image.effective_ocr_prompt
+  end
+
+  test "effective_ocr_prompt returns default pattern prompt when no pattern set" do
+    image = images(:completed_image)
+    image.ocr_prompt_pattern = nil
+    image.ocr_prompt_text = nil
+    default_pattern = OcrPromptPattern.default_or_first
+    if default_pattern
+      assert_equal default_pattern.prompt, image.effective_ocr_prompt
+    else
+      assert_equal Setting.effective_ocr_prompt, image.effective_ocr_prompt
+    end
+  end
 end

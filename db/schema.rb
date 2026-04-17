@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_06_062527) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_17_092736) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -75,15 +75,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_062527) do
     t.string "name"
     t.datetime "ocr_completed_at"
     t.integer "ocr_duration"
+    t.integer "ocr_prompt_pattern_id"
+    t.text "ocr_prompt_text"
     t.text "ocr_result"
     t.datetime "purged_at"
     t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["image_group_id"], name: "index_images_on_image_group_id"
+    t.index ["ocr_prompt_pattern_id"], name: "index_images_on_ocr_prompt_pattern_id"
     t.index ["purged_at"], name: "index_images_on_purged_at"
     t.index ["status"], name: "index_images_on_status"
     t.index ["user_id"], name: "index_images_on_user_id"
+  end
+
+  create_table "ocr_prompt_patterns", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "is_default", default: false
+    t.string "name", null: false
+    t.integer "position", default: 0
+    t.text "prompt", null: false
+    t.datetime "updated_at", null: false
+    t.index ["is_default"], name: "index_ocr_prompt_patterns_on_is_default"
+    t.index ["position"], name: "index_ocr_prompt_patterns_on_position"
   end
 
   create_table "ocr_settings", force: :cascade do |t|
@@ -146,6 +160,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_062527) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "image_groups", "users"
   add_foreign_key "images", "image_groups"
+  add_foreign_key "images", "ocr_prompt_patterns"
   add_foreign_key "images", "users"
   add_foreign_key "webauthn_credentials", "users"
 end

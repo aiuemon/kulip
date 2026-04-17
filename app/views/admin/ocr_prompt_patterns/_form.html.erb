@@ -1,0 +1,34 @@
+<%= form_with model: [:admin, @ocr_prompt_pattern], class: "needs-validation" do |f| %>
+  <% if @ocr_prompt_pattern.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% @ocr_prompt_pattern.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= f.label :name, "パターン名", class: "form-label" %>
+    <%= f.text_field :name, class: "form-control", placeholder: "例: 標準テキスト認識" %>
+    <div class="form-text">利用者がプルダウンで選択する際に表示される名前です。</div>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :prompt, "プロンプト", class: "form-label" %>
+    <%= f.text_area :prompt, class: "form-control", rows: 10, placeholder: Setting::DEFAULT_OCR_PROMPT %>
+    <div class="form-text">OCR 処理時に使用するプロンプトです。</div>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :position, "表示順序", class: "form-label" %>
+    <%= f.number_field :position, class: "form-control", min: 0, style: "max-width: 150px;" %>
+    <div class="form-text">数字が小さいほど上に表示されます。</div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= f.submit @ocr_prompt_pattern.persisted? ? "更新" : "作成", class: "btn btn-primary" %>
+    <%= link_to "キャンセル", admin_ocr_prompt_patterns_path, class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>

@@ -21,12 +21,13 @@ class OcrApiClient
   # @param image_data [String] 画像のバイナリデータ
   # @param filename [String] ファイル名（未使用だが互換性のため残す）
   # @param content_type [String] Content-Type（未使用だが互換性のため残す）
+  # @param prompt [String] OCR プロンプト（指定がない場合は Setting から取得）
   # @return [String] OCR 結果テキスト
-  def transcribe(image_data:, filename: nil, content_type: nil)
+  def transcribe(image_data:, filename: nil, content_type: nil, prompt: nil)
     uri = URI.parse(@endpoint)
     http = build_http_client(uri)
 
-    request = build_json_request(uri, image_data)
+    request = build_json_request(uri, image_data, prompt)
     response = execute_request(http, request)
 
     parse_response(response)
@@ -47,12 +48,12 @@ class OcrApiClient
     http
   end
 
-  def build_json_request(uri, image_data)
+  def build_json_request(uri, image_data, prompt = nil)
     image_b64 = Base64.strict_encode64(image_data)
 
     payload = {
       model: Setting.ocr_model,
-      prompt: Setting.effective_ocr_prompt,
+      prompt: prompt || Setting.effective_ocr_prompt,
       images: [ image_b64 ],
       stream: true,
       options: Setting.effective_ocr_options
