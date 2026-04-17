@@ -17,7 +17,7 @@
 
   <div class="mb-3">
     <%= f.label :prompt, "プロンプト", class: "form-label" %>
-    <%= f.text_area :prompt, class: "form-control", rows: 10, placeholder: Setting::DEFAULT_OCR_PROMPT %>
+    <%= f.text_area :prompt, class: "form-control", rows: 10, placeholder: "例: この画像のテキストを文字起こししてください。" %>
     <div class="form-text">OCR 処理時に使用するプロンプトです。</div>
   </div>
 

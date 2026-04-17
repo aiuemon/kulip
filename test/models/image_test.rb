@@ -236,10 +236,14 @@ class ImageTest < ActiveSupport::TestCase
     image.ocr_prompt_pattern = nil
     image.ocr_prompt_text = nil
     default_pattern = OcrPromptPattern.default_or_first
-    if default_pattern
-      assert_equal default_pattern.prompt, image.effective_ocr_prompt
-    else
-      assert_equal Setting.effective_ocr_prompt, image.effective_ocr_prompt
-    end
+    assert_equal default_pattern.prompt, image.effective_ocr_prompt
+  end
+
+  test "effective_ocr_prompt returns nil when no patterns exist" do
+    image = images(:completed_image)
+    image.ocr_prompt_pattern = nil
+    image.ocr_prompt_text = nil
+    OcrPromptPattern.delete_all
+    assert_nil image.effective_ocr_prompt
   end
 end

@@ -4,8 +4,6 @@ class Setting < RailsSettings::Base
   # === 定数 ===
   DEFAULT_OCR_TIMEOUT = 300
 
-  DEFAULT_OCR_PROMPT = "この画像のテキストを文字起こししてください。単なる文字の羅列ではなく、見出し、段落、箇条書きなどをLLMの能力で解釈し、Markdown形式で美しく構造化して出力してください。\n推論プロセスは必ず <think> と </think> のタグで囲んで最初に出力し、その後に最終的なMarkdownテキストを出力してください。".freeze
-
   DEFAULT_OCR_OPTIONS = {
     "temperature" => 0.4,
     "num_predict" => -1,
@@ -52,7 +50,6 @@ class Setting < RailsSettings::Base
   field :ocr_api_key, type: :string, default: ""
   field :ocr_timeout, type: :integer, default: 300
   field :ocr_model, type: :string, default: ""
-  field :ocr_prompt, type: :string, default: ""
   field :ocr_options, type: :hash, default: {}
 
   # === クォータ設定 ===
@@ -138,10 +135,6 @@ class Setting < RailsSettings::Base
     def effective_ocr_timeout
       timeout = ocr_timeout
       timeout.present? && timeout > 0 ? timeout : DEFAULT_OCR_TIMEOUT
-    end
-
-    def effective_ocr_prompt
-      ocr_prompt.presence || DEFAULT_OCR_PROMPT
     end
 
     def effective_ocr_options

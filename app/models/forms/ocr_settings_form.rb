@@ -7,7 +7,6 @@ module Forms
     attribute :api_key, :string
     attribute :timeout, :integer
     attribute :model, :string
-    attribute :prompt, :string
     attribute :options, :string
 
     validates :timeout, numericality: { greater_than: 0, less_than_or_equal_to: 3600 }, allow_blank: true
@@ -25,7 +24,6 @@ module Forms
       Setting.ocr_api_key = api_key.to_s
       Setting.ocr_timeout = timeout.presence || Setting::DEFAULT_OCR_TIMEOUT
       Setting.ocr_model = model.to_s
-      Setting.ocr_prompt = prompt.to_s
       Setting.ocr_options = parsed_options
       true
     rescue => e
@@ -57,7 +55,6 @@ module Forms
       self.api_key = Setting.ocr_api_key
       self.timeout = Setting.ocr_timeout
       self.model = Setting.ocr_model
-      self.prompt = Setting.ocr_prompt
       self.options = options_for_display
     end
 

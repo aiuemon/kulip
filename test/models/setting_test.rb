@@ -41,11 +41,6 @@ class SettingTest < ActiveSupport::TestCase
     assert_equal Setting::DEFAULT_OCR_TIMEOUT, Setting.effective_ocr_timeout
   end
 
-  test "effective_ocr_prompt returns default when blank" do
-    Setting.ocr_prompt = ""
-    assert_equal Setting::DEFAULT_OCR_PROMPT, Setting.effective_ocr_prompt
-  end
-
   test "effective_ocr_options returns default when empty" do
     Setting.ocr_options = {}
     assert_equal Setting::DEFAULT_OCR_OPTIONS, Setting.effective_ocr_options

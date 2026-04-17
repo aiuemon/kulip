@@ -58,12 +58,12 @@ class Image < ApplicationRecord
   end
 
   # OCR 処理に使用するプロンプトを取得
-  # 優先順位: 1. 保存済みのプロンプトテキスト 2. パターンのプロンプト 3. デフォルトパターン 4. Setting
+  # 優先順位: 1. 保存済みのプロンプトテキスト 2. パターンのプロンプト 3. デフォルトパターン
   def effective_ocr_prompt
     return ocr_prompt_text if ocr_prompt_text.present?
     return ocr_prompt_pattern.prompt if ocr_prompt_pattern.present?
 
-    OcrPromptPattern.default_or_first&.prompt || Setting.effective_ocr_prompt
+    OcrPromptPattern.default_or_first&.prompt
   end
 
   # ファイルを削除（論理削除）
