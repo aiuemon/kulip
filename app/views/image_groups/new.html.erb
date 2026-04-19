@@ -15,26 +15,6 @@
 <div class="card">
   <div class="card-body dropzone" data-controller="dropzone">
     <%= form_with url: image_groups_path, method: :post, multipart: true do |f| %>
-      <div class="mb-3">
-        <label for="memo" class="form-label">メモ（省略可）</label>
-        <%= text_field_tag :memo, nil, placeholder: "任意のメモを入力できます", class: "form-control" %>
-      </div>
-
-      <% if OcrPromptPattern.any? %>
-        <div class="mb-3">
-          <label for="ocr_prompt_pattern_id" class="form-label">プロンプトパターン</label>
-          <%= select_tag :ocr_prompt_pattern_id,
-              options_from_collection_for_select(
-                OcrPromptPattern.ordered,
-                :id,
-                :name,
-                OcrPromptPattern.default_or_first&.id
-              ),
-              class: "form-select",
-              style: "max-width: 400px;" %>
-          <div class="form-text">OCR 処理に使用するプロンプトを選択してください。</div>
-        </div>
-      <% end %>
 
       <div class="mb-3">
         <label for="images" class="form-label">ファイル（複数選択可）</label>
@@ -42,8 +22,28 @@
           <p class="mb-2 text-muted">ここにファイルをドラッグ&ドロップ</p>
           <p class="mb-2 text-muted">または</p>
           <%= file_field_tag "images[]", multiple: true, accept: "image/*,.heic,.heif,application/pdf", class: "form-control", data: { dropzone_target: "input", action: "change->dropzone#onChange" } %>
-          <p class="mt-2 mb-0 text-muted small" data-dropzone-target="label">JPEG, PNG, GIF, HEIC 等の画像ファイル、または PDF ファイルをアップロードできます（PDF は最大 <%= Setting.effective_pdf_max_pages %> ページまで）</p>
+          <p class="mt-2 mb-0 text-muted small" data-dropzone-target="label">JPEG, PNG, GIF, HEIC 等の画像ファイル、または PDF ファイルをアップロードできます。PDF は最大 <%= Setting.effective_pdf_max_pages %> ページまで。</p>
         </div>
+      </div>
+
+      <% if OcrPromptPattern.any? %>
+        <div class="mb-3">
+          <label for="ocr_prompt_pattern_id" class="form-label">処理方法</label>
+          <%= select_tag :ocr_prompt_pattern_id,
+                         options_from_collection_for_select(
+                           OcrPromptPattern.ordered,
+                           :id,
+                           :name,
+                           OcrPromptPattern.default_or_first&.id
+                         ),
+                         class: "form-select",
+                         style: "max-width: 400px;" %>
+        </div>
+      <% end %>
+
+      <div class="mb-3">
+        <label for="memo" class="form-label">メモ（省略可）</label>
+        <%= text_field_tag :memo, nil, placeholder: "任意のメモを入力できます", class: "form-control" %>
       </div>
 
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
