@@ -30,14 +30,14 @@
         <div class="mb-3">
           <label for="ocr_prompt_pattern_id" class="form-label">処理方法</label>
           <%= select_tag :ocr_prompt_pattern_id,
-                         options_from_collection_for_select(
-                           OcrPromptPattern.ordered,
-                           :id,
-                           :name,
-                           OcrPromptPattern.default_or_first&.id
-                         ),
-                         class: "form-select",
-                         style: "max-width: 400px;" %>
+              options_from_collection_for_select(
+                OcrPromptPattern.ordered,
+                :id,
+                :name,
+                OcrPromptPattern.default_or_first&.id
+              ),
+              class: "form-select",
+              style: "max-width: 400px;" %>
         </div>
       <% end %>
 
