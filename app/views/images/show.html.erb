@@ -87,10 +87,7 @@
   <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
       <span>OCR 結果</span>
-      <div>
-        <%= link_to "TXT", download_image_path(@image, format: "txt"), class: "btn btn-success btn-sm" %>
-        <%= link_to "MD", download_image_path(@image, format: "md"), class: "btn btn-outline-success btn-sm" %>
-      </div>
+      <%= link_to "ダウンロード", download_image_path(@image), class: "btn btn-success btn-sm" %>
     </div>
     <div class="card-body">
       <pre class="mb-0" style="white-space: pre-wrap; word-wrap: break-word;"><%= @image.ocr_result %></pre>
